@@ -1,18 +1,35 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/app/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+
+        bgSecondaryHover: "var(--bgSecondaryHover)",
+        instagram: "var(--instagram)",
+        facebook: "var(--facebook)",
+        youtube: "var(--youtube)",
+        dribbble: "var(--dribbble)",
+        linkedin: "var(--linkedin)",
+        twitter: "var(--twitter)",
+        shopify: "var(--shopify)",
+      },
+    },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "2rem",
+        sm: "2rem",
+        lg: "0",
+      },
+      screens: {
+        xl: "960px",
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
 export default config;

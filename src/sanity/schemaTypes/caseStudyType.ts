@@ -25,6 +25,20 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     },
     {
+      name: "mainImage",
+      type: "image",
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        {
+          name: "alt",
+          type: "string",
+          title: "Alternative text",
+        },
+      ],
+    },
+    {
       name: "description",
       title: "Description",
       type: "array",

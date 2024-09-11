@@ -15,6 +15,14 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"]{
 }
 `);
 
+export const CASE_STUDIES_PREVIEW_QUERY = defineQuery(`*[_type == "caseStudy"]{
+  _id,
+  title,
+  subtitle,
+  teaser,
+}
+`);
+
 export const POSTS_QUERY = defineQuery(`*[_type == "post"]{
   _id,
   title,
