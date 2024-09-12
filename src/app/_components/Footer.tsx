@@ -43,10 +43,10 @@ const Footer = ({
     <footer className={clsx("py-6", "border-t")}>
       <div className={clsx("grid", "container", "md:grid-cols-2")}>
         <div className={clsx("flex", "gap-8", "justify-start", "items-center")}>
-          <p className="text-sml">Adam Rasheed © {year}</p>
+          <p className="text-sml leading-none">Adam Rasheed © {year}</p>
           {resume && (
             <a
-              className="btn lrg"
+              className="btn lrg pt-[6px]"
               href={resume}
               target="_blank"
               rel="noopener noreferrer"

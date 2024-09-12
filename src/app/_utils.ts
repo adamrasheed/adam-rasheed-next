@@ -1,3 +1,10 @@
+export const PATHS = {
+  ABOUT: "/about",
+  BLOG: "/blog",
+  CASE_STUDIES: "/case-studies",
+  FREELANCE: "/freelance",
+};
+
 export const ROUTES = [
   {
     label: "About",
@@ -16,3 +23,11 @@ export const ROUTES = [
     href: "/freelance",
   },
 ];
+
+export const getFormattedDate = (date: string) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};

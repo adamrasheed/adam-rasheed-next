@@ -325,8 +325,33 @@ export type CASE_STUDIES_PREVIEW_QUERYResult = Array<{
   teaser: string | null;
 }>;
 // Variable: POSTS_QUERY
-// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title  },  publishedAt,  body[]{    ...,    _type == "image" => {      "imageUrl": asset->url,      alt    }  }}
+// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title  },  publishedAt,}
 export type POSTS_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  excerpt: null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  categories: Array<{
+    _id: string;
+    title: string | null;
+  }> | null;
+  publishedAt: string | null;
+}>;
+// Variable: SINGLE_POST_QUERY
+// Query: *[_type == "post" && slug.current == $slug][0]{    _id,    title,    slug,    excerpt,    mainImage,    categories[]->{      _id,      title    },    publishedAt,    body[]{      ...,      _type == "image" => {        "imageUrl": asset->url,        alt      }    }  }
+export type SINGLE_POST_QUERYResult = {
   _id: string;
   title: string | null;
   slug: Slug | null;
@@ -379,7 +404,7 @@ export type POSTS_QUERYResult = Array<{
     _key: string;
     imageUrl: string | null;
   }> | null;
-}>;
+} | null;
 // Variable: SITE_INFO_QUERY
 // Query: *[_type == "siteInfo"]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia}
 export type SITE_INFO_QUERYResult = Array<never>;
@@ -390,7 +415,8 @@ declare module "@sanity/client" {
   interface SanityQueries {
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  description[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": CASE_STUDIES_QUERYResult;
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n}\n": CASE_STUDIES_PREVIEW_QUERYResult;
-    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title\n  },\n  publishedAt,\n  body[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": POSTS_QUERYResult;
+    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title\n  },\n  publishedAt,\n}\n": POSTS_QUERYResult;
+    "\n  *[_type == \"post\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    excerpt,\n    mainImage,\n    categories[]->{\n      _id,\n      title\n    },\n    publishedAt,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": SINGLE_POST_QUERYResult;
     "*[_type == \"siteInfo\"]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
   }
 }

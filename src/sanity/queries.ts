@@ -34,14 +34,29 @@ export const POSTS_QUERY = defineQuery(`*[_type == "post"]{
     title
   },
   publishedAt,
-  body[]{
-    ...,
-    _type == "image" => {
-      "imageUrl": asset->url,
-      alt
+}
+`);
+
+export const SINGLE_POST_QUERY = defineQuery(`
+  *[_type == "post" && slug.current == $slug][0]{
+    _id,
+    title,
+    slug,
+    excerpt,
+    mainImage,
+    categories[]->{
+      _id,
+      title
+    },
+    publishedAt,
+    body[]{
+      ...,
+      _type == "image" => {
+        "imageUrl": asset->url,
+        alt
+      }
     }
   }
-}
 `);
 
 export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"]{

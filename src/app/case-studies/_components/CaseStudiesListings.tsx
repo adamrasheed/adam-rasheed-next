@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { CASE_STUDIES_QUERYResult } from "../../../../sanity.types";
 
 const CaseStudiesListings = ({
@@ -8,7 +9,7 @@ const CaseStudiesListings = ({
   console.log({ caseStudies });
 
   return (
-    <div>
+    <div className={clsx("container", "grid", "grid-cols-2", "gap-8")}>
       {caseStudies.map((caseStudy, idx) => (
         <div key={`${caseStudy._id}_${idx}`}>
           <h2>{caseStudy.title}</h2>

@@ -10,6 +10,7 @@ export const postType = defineType({
     defineField({
       name: "title",
       type: "string",
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "slug",
@@ -17,6 +18,7 @@ export const postType = defineType({
       options: {
         source: "title",
       },
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "excerpt",
@@ -44,6 +46,7 @@ export const postType = defineType({
     defineField({
       name: "publishedAt",
       type: "datetime",
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "body",
