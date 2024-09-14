@@ -1,11 +1,13 @@
 import { sanityFetch } from "@/sanity/lib/client";
 import type { Metadata } from "next";
-import { SITE_INFO_QUERY } from "@/sanity/queries";
+import { HOME_QUERY } from "@/sanity/queries";
 import Header from "./_components/Header";
 import { SiteInfoQueryRizzult } from "./_types";
 import Footer from "./_components/Footer";
 import { PortableText } from "@portabletext/react";
 import clsx from "clsx";
+import { HOME_QUERYResult } from "../../sanity.types";
+import PreviewBlock from "./_components/PreviewBlock";
 
 export const metadata: Metadata = {
   title: "Adam Rasheed | Software Engineer",
@@ -14,13 +16,15 @@ export const metadata: Metadata = {
 };
 
 export default async function IndexPage() {
-  const siteInfo = await sanityFetch<SiteInfoQueryRizzult>({
-    query: SITE_INFO_QUERY,
+  const { siteInfo, posts, caseStudies } = await sanityFetch<HOME_QUERYResult>({
+    query: HOME_QUERY,
   });
 
-  const { title, description, resume, socialMedia } = siteInfo[0];
+  const info = siteInfo[0] as SiteInfoQueryRizzult[0];
 
-  console.log(description);
+  const { title, description, resume, socialMedia } = info;
+
+  console.log(posts, caseStudies);
 
   return (
     <>
@@ -45,6 +49,9 @@ export default async function IndexPage() {
               }}
             />
           </div>
+          <PreviewBlock title="Blog" href="/blog">
+            <p>Hello</p>
+          </PreviewBlock>
         </div>
       </main>
       <Footer socialMedia={socialMedia} resume={resume} />

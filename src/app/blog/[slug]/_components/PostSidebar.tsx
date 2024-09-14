@@ -1,11 +1,18 @@
 import clsx from "clsx";
+import { SINGLE_POST_QUERYResult } from "../../../../../sanity.types";
+import Link from "next/link";
+import { PATHS } from "@/app/_utils";
 
-const PostSidebar = () => {
+type SidebarPostsType = SINGLE_POST_QUERYResult["fallbackPosts"];
+
+const PostSidebar = ({ posts }: { posts: SidebarPostsType }) => {
+  if (!posts || !posts.length) return null;
+
   return (
     <aside
       className={clsx(
         "sidebar",
-        "space-y-8",
+        "space-y-4",
         "max-w-[16rem]",
         "md:sticky",
         "md:top-8",
@@ -24,10 +31,17 @@ const PostSidebar = () => {
       >
         Related Posts
       </h2>
-      <ul>
-        <li>Post 1</li>
-        <li>Post 2</li>
-        <li>Post 3</li>
+      <ul className="space-y-4">
+        {posts.map((post) => (
+          <li key={post._id}>
+            <Link
+              href={`${PATHS.BLOG}/${post.slug?.current || ""}`}
+              className="text-sm"
+            >
+              {post.title}
+            </Link>
+          </li>
+        ))}
       </ul>
     </aside>
   );

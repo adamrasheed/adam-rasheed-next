@@ -6,6 +6,7 @@ export const structure: StructureResolver = (S) =>
     .title("Site")
     .items([
       S.documentTypeListItem("post").title("Posts"),
+      S.documentTypeListItem("page").title("Pages"),
       S.documentTypeListItem("category").title("Categories"),
       S.documentTypeListItem("caseStudy").title("Case Studies"),
       S.divider(),
@@ -16,7 +17,9 @@ export const structure: StructureResolver = (S) =>
       ...S.documentTypeListItems().filter(
         (item) =>
           item.getId() &&
-          !["post", "category", "caseStudy", "siteInfo"].includes(item.getId()!)
+          !["post", "page", "category", "caseStudy", "siteInfo"].includes(
+            item.getId()!
+          )
       ),
       S.divider(),
     ]);

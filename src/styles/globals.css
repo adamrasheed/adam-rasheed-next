@@ -221,7 +221,7 @@ body {
   }
 
   .post-container {
-    @apply container my-4 md:my-6 grid gap-8 md:grid-cols-[1fr_auto];
+    @apply container px-0 my-4 md:my-6 grid gap-8 md:grid-cols-[1fr_auto];
   }
 
   .page-content {

@@ -7,9 +7,9 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string };
 }) {
-  const post = await client.fetch(SINGLE_POST_QUERY, { slug });
+  const singlePost = await client.fetch(SINGLE_POST_QUERY, { slug });
 
-  if (!post) return <p>No post found</p>;
+  if (!singlePost || !singlePost.post) return <p>No post found</p>;
 
-  return <Post post={post} />;
+  return <Post singlePost={singlePost} />;
 }

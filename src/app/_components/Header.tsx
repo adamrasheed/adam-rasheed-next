@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ROUTES } from "../_utils";
+import { PATHS, ROUTES } from "../_utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -12,7 +12,11 @@ type HeaderProps = {
 };
 const Header = ({ title }: HeaderProps) => {
   const currentPathFull = usePathname();
-  const currentPath = currentPathFull.split("/").pop();
+
+  const currentPaths = currentPathFull.split("/");
+  const isBlog = currentPaths.includes("blog");
+  const isCaseStudy = currentPaths.includes("case-studies");
+  const currentPath = currentPaths.pop();
 
   return (
     <header
@@ -60,7 +64,10 @@ const Header = ({ title }: HeaderProps) => {
               "letter-spacing",
               "small-caps",
               {
-                [`underline`]: currentPath === route.href.split("/").pop(),
+                [`underline`]:
+                  currentPath === route.href.split("/").pop() ||
+                  (route.href === PATHS.BLOG && isBlog) ||
+                  (route.href === PATHS.CASE_STUDIES && isCaseStudy),
               }
             )}
           >

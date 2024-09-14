@@ -8,19 +8,19 @@ export const PATHS = {
 export const ROUTES = [
   {
     label: "About",
-    href: "/about",
+    href: PATHS.ABOUT,
   },
   {
     label: "Case Studies",
-    href: "/case-studies",
+    href: PATHS.CASE_STUDIES,
   },
   {
     label: "Blog",
-    href: "/blog",
+    href: PATHS.BLOG,
   },
   {
     label: "Freelance",
-    href: "/freelance",
+    href: PATHS.FREELANCE,
   },
 ];
 

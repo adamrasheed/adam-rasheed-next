@@ -5,7 +5,7 @@ import { getFormattedDate, PATHS } from "@/app/_utils";
 
 const PostListings = ({ posts }: { posts: POSTS_QUERYResult }) => {
   return (
-    <div className={clsx("container", "grid", "grid-cols-2", "gap-8")}>
+    <div className={clsx("container", "px-0", "grid", "grid-cols-2", "gap-8")}>
       {posts.map((post) => (
         <div key={post._id} className="space-y-2">
           <h2 className="font-semibold text-lg">

@@ -325,7 +325,7 @@ export type CASE_STUDIES_PREVIEW_QUERYResult = Array<{
   teaser: string | null;
 }>;
 // Variable: POSTS_QUERY
-// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title  },  publishedAt,}
+// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  mainImage,  publishedAt,}
 export type POSTS_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -343,71 +343,105 @@ export type POSTS_QUERYResult = Array<{
     alt?: string;
     _type: "image";
   } | null;
-  categories: Array<{
-    _id: string;
-    title: string | null;
-  }> | null;
   publishedAt: string | null;
 }>;
-// Variable: SINGLE_POST_QUERY
-// Query: *[_type == "post" && slug.current == $slug][0]{    _id,    title,    slug,    excerpt,    mainImage,    categories[]->{      _id,      title    },    publishedAt,    body[]{      ...,      _type == "image" => {        "imageUrl": asset->url,        alt      }    }  }
-export type SINGLE_POST_QUERYResult = {
+// Variable: POSTS_PREVIEWS_QUERY
+// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  publishedAt,}
+export type POSTS_PREVIEWS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
   excerpt: null;
-  mainImage: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  } | null;
-  categories: Array<{
+  publishedAt: string | null;
+}>;
+// Variable: SINGLE_POST_QUERY
+// Query: {    // Fetch the single post by its slug    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage,      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        // Fetch up to 3 related posts based on categories    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && count(*[_type == 'post' && slug.current == $slug].categories) > 0 && categories[]->_id in *[_type == 'post' && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      mainImage,      excerpt,      categories[]->{        _id,        title      },      publishedAt    },        // Fetch fallback posts if there are less than 3 related posts    "fallbackPosts": *[_type == "post" && slug.current != $slug && !(_id in path('drafts.**'))] | order(publishedAt desc)[0...3]{      _id,      title,      slug,    }  }
+export type SINGLE_POST_QUERYResult = {
+  post: {
     _id: string;
     title: string | null;
-  }> | null;
-  publishedAt: string | null;
-  body: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
+    slug: Slug | null;
+    excerpt: null;
+    mainImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    categories: Array<{
+      _id: string;
+      title: string | null;
+    }> | null;
+    publishedAt: string | null;
+    body: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
+      listItem?: "bullet";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
       _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
+    } | {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt: string | null;
+      _type: "image";
       _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt: string | null;
-    _type: "image";
-    _key: string;
-    imageUrl: string | null;
-  }> | null;
-} | null;
+      imageUrl: string | null;
+    }> | null;
+  } | null;
+  relatedPostsByCategory: Array<never>;
+  fallbackPosts: Array<{
+    _id: string;
+    title: string | null;
+    slug: Slug | null;
+  }>;
+};
+// Variable: PAGE_QUERY
+// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    slug,    body[]{      ...,      _type == "image" => {        "imageUrl": asset->url,        alt      }    }  }
+export type PAGE_QUERYResult = null;
 // Variable: SITE_INFO_QUERY
 // Query: *[_type == "siteInfo"]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia}
 export type SITE_INFO_QUERYResult = Array<never>;
+// Variable: HOME_QUERY
+// Query: {  "siteInfo": *[_type == "siteInfo"]{    _id,    title,    email,    resume,    description[]{      ...,    },    socialMedia  },  "caseStudies": *[_type == "caseStudy"]{    _id,    title,    subtitle,    teaser,  }[0...2],  "posts": *[_type == "post"]{    _id,    title,    slug,    excerpt,    publishedAt,  }[0...2]}
+export type HOME_QUERYResult = {
+  siteInfo: Array<never>;
+  caseStudies: Array<{
+    _id: string;
+    title: string | null;
+    subtitle: string | null;
+    teaser: string | null;
+  }>;
+  posts: Array<{
+    _id: string;
+    title: string | null;
+    slug: Slug | null;
+    excerpt: null;
+    publishedAt: string | null;
+  }>;
+};
 
 // Query TypeMap
 import "@sanity/client";
@@ -415,8 +449,11 @@ declare module "@sanity/client" {
   interface SanityQueries {
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  description[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": CASE_STUDIES_QUERYResult;
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n}\n": CASE_STUDIES_PREVIEW_QUERYResult;
-    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title\n  },\n  publishedAt,\n}\n": POSTS_QUERYResult;
-    "\n  *[_type == \"post\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    excerpt,\n    mainImage,\n    categories[]->{\n      _id,\n      title\n    },\n    publishedAt,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": SINGLE_POST_QUERYResult;
+    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  publishedAt,\n}\n": POSTS_QUERYResult;
+    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n}\n": POSTS_PREVIEWS_QUERYResult;
+    "\n  {\n    // Fetch the single post by its slug\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage,\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    // Fetch up to 3 related posts based on categories\n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && count(*[_type == 'post' && slug.current == $slug].categories) > 0 && categories[]->_id in *[_type == 'post' && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      mainImage,\n      excerpt,\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt\n    },\n    \n    // Fetch fallback posts if there are less than 3 related posts\n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug && !(_id in path('drafts.**'))] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n    }\n  }\n": SINGLE_POST_QUERYResult;
+    "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
     "*[_type == \"siteInfo\"]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
+    "{\n  \"siteInfo\": *[_type == \"siteInfo\"]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
   }
 }
