@@ -36,6 +36,20 @@ type Block = Array<
     }
 >;
 
+export type SanityMainImage = {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    ["internalGroqTypeReferenceTo"]?: "sanity.imageAsset";
+  };
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  _type: "image";
+  metadata: null;
+};
+
 export type SiteInfoQueryRizzult = {
   socialMedia: {
     youtube?: string | null;

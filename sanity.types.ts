@@ -68,6 +68,42 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type SiteInfo = {
+  _id: string;
+  _type: "siteInfo";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  email?: string;
+  resume?: string;
+  socialMedia?: {
+    x?: string;
+    instagram?: string;
+    linkedIn?: string;
+    github?: string;
+    youtube?: string;
+  };
+};
+
 export type CaseStudy = {
   _id: string;
   _type: "caseStudy";
@@ -75,8 +111,21 @@ export type CaseStudy = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  slug?: Slug;
   subtitle?: string;
   teaser?: string;
+  mainImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
   description?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -109,6 +158,46 @@ export type CaseStudy = {
   }>;
 };
 
+export type Page = {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -117,6 +206,7 @@ export type Post = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  excerpt?: string;
   mainImage?: {
     asset?: {
       _ref: string;
@@ -167,6 +257,72 @@ export type Post = {
     _type: "image";
     _key: string;
   }>;
+};
+
+export type Contribution = {
+  _type: "contribution";
+  title?: string;
+  contributions?: Array<{
+    title?: string;
+    link?: string;
+    description?: string;
+    date?: string;
+    _type: "contribution";
+    _key: string;
+  }>;
+};
+
+export type About = {
+  _id: string;
+  _type: "about";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  bio?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  mainImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  contributions?: Array<{
+    _key: string;
+  } & Contribution>;
 };
 
 export type Category = {
@@ -274,16 +430,28 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | CaseStudy | Post | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
-// Query: *[_type == "caseStudy"]{  _id,  title,  subtitle,  teaser,  description[]{    ...,    _type == "image" => {      "imageUrl": asset->url,      alt    }  }}
+// Query: *[_type == "caseStudy"]{  _id,  title,  subtitle,  teaser,  mainImage,  description[]{    ...,    _type == "image" => {      "imageUrl": asset->url,      alt    }  }}
 export type CASE_STUDIES_QUERYResult = Array<{
   _id: string;
   title: string | null;
   subtitle: string | null;
   teaser: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
   description: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -330,7 +498,7 @@ export type POSTS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
-  excerpt: null;
+  excerpt: string | null;
   mainImage: {
     asset?: {
       _ref: string;
@@ -351,28 +519,23 @@ export type POSTS_PREVIEWS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
-  excerpt: null;
+  excerpt: string | null;
   publishedAt: string | null;
 }>;
 // Variable: SINGLE_POST_QUERY
-// Query: {    // Fetch the single post by its slug    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage,      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        // Fetch up to 3 related posts based on categories    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && count(*[_type == 'post' && slug.current == $slug].categories) > 0 && categories[]->_id in *[_type == 'post' && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      mainImage,      excerpt,      categories[]->{        _id,        title      },      publishedAt    },        // Fetch fallback posts if there are less than 3 related posts    "fallbackPosts": *[_type == "post" && slug.current != $slug && !(_id in path('drafts.**'))] | order(publishedAt desc)[0...3]{      _id,      title,      slug,    }  }
+// Query: {    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage {        asset->{          url,          metadata        },        alt      },      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == "post" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },        "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    }  }
 export type SINGLE_POST_QUERYResult = {
   post: {
     _id: string;
     title: string | null;
     slug: Slug | null;
-    excerpt: null;
+    excerpt: string | null;
     mainImage: {
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
+      asset: {
+        url: string | null;
+        metadata: SanityImageMetadata | null;
+      } | null;
+      alt: string | null;
     } | null;
     categories: Array<{
       _id: string;
@@ -416,21 +579,132 @@ export type SINGLE_POST_QUERYResult = {
     _id: string;
     title: string | null;
     slug: Slug | null;
+    excerpt: string | null;
+    publishedAt: string | null;
   }>;
 };
 // Variable: PAGE_QUERY
 // Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    slug,    body[]{      ...,      _type == "image" => {        "imageUrl": asset->url,        alt      }    }  }
-export type PAGE_QUERYResult = null;
+export type PAGE_QUERYResult = {
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt: string | null;
+    _type: "image";
+    _key: string;
+    imageUrl: string | null;
+  }> | null;
+} | null;
 // Variable: SITE_INFO_QUERY
 // Query: *[_type == "siteInfo"]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia}
-export type SITE_INFO_QUERYResult = Array<never>;
+export type SITE_INFO_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  email: string | null;
+  resume: string | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  socialMedia: {
+    x?: string;
+    instagram?: string;
+    linkedIn?: string;
+    github?: string;
+    youtube?: string;
+  } | null;
+}>;
 // Variable: HOME_QUERY
-// Query: {  "siteInfo": *[_type == "siteInfo"]{    _id,    title,    email,    resume,    description[]{      ...,    },    socialMedia  },  "caseStudies": *[_type == "caseStudy"]{    _id,    title,    subtitle,    teaser,  }[0...2],  "posts": *[_type == "post"]{    _id,    title,    slug,    excerpt,    publishedAt,  }[0...2]}
+// Query: {  "siteInfo": *[_type == "siteInfo"]{    _id,    title,    email,    resume,    description[]{      ...,    },    socialMedia  },  "caseStudies": *[_type == "caseStudy"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    subtitle,    teaser,  }[0...2],  "posts": *[_type == "post"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    excerpt,    publishedAt,  }[0...2]}
 export type HOME_QUERYResult = {
-  siteInfo: Array<never>;
+  siteInfo: Array<{
+    _id: string;
+    title: string | null;
+    email: string | null;
+    resume: string | null;
+    description: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+    socialMedia: {
+      x?: string;
+      instagram?: string;
+      linkedIn?: string;
+      github?: string;
+      youtube?: string;
+    } | null;
+  }>;
   caseStudies: Array<{
     _id: string;
     title: string | null;
+    slug: Slug | null;
+    mainImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+      metadata: null;
+    } | null;
     subtitle: string | null;
     teaser: string | null;
   }>;
@@ -438,22 +712,78 @@ export type HOME_QUERYResult = {
     _id: string;
     title: string | null;
     slug: Slug | null;
-    excerpt: null;
+    mainImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+      metadata: null;
+    } | null;
+    excerpt: string | null;
     publishedAt: string | null;
   }>;
 };
+// Variable: ABOUT_QUERY
+// Query: *[_type == "about"][0]{  _id,  _createdAt,  _updatedAt,  bio[]{    _key,    children[]{      _key,      _type,      text    }  },  contributions[]{    _key,    title,    contributions[]{      _key,      title,      date,      description,      link    }  },  mainImage {    ...,    metadata  },}
+export type ABOUT_QUERYResult = {
+  _id: string;
+  _createdAt: string;
+  _updatedAt: string;
+  bio: Array<{
+    _key: string;
+    children: null;
+  } | {
+    _key: string;
+    children: Array<{
+      _key: string;
+      _type: "span";
+      text: string | null;
+    }> | null;
+  }> | null;
+  contributions: Array<{
+    _key: string;
+    title: string | null;
+    contributions: Array<{
+      _key: string;
+      title: string | null;
+      date: string | null;
+      description: string | null;
+      link: string | null;
+    }> | null;
+  }> | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    metadata: null;
+  } | null;
+} | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  description[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": CASE_STUDIES_QUERYResult;
+    "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  mainImage,\n  description[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": CASE_STUDIES_QUERYResult;
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n}\n": CASE_STUDIES_PREVIEW_QUERYResult;
     "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  publishedAt,\n}\n": POSTS_QUERYResult;
     "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n}\n": POSTS_PREVIEWS_QUERYResult;
-    "\n  {\n    // Fetch the single post by its slug\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage,\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    // Fetch up to 3 related posts based on categories\n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && count(*[_type == 'post' && slug.current == $slug].categories) > 0 && categories[]->_id in *[_type == 'post' && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      mainImage,\n      excerpt,\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt\n    },\n    \n    // Fetch fallback posts if there are less than 3 related posts\n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug && !(_id in path('drafts.**'))] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n    }\n  }\n": SINGLE_POST_QUERYResult;
+    "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == \"post\" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    }\n  }\n": SINGLE_POST_QUERYResult;
     "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
     "*[_type == \"siteInfo\"]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
-    "{\n  \"siteInfo\": *[_type == \"siteInfo\"]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
+    "{\n  \"siteInfo\": *[_type == \"siteInfo\"]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
+    "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    _key,\n    children[]{\n      _key,\n      _type,\n      text\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
   }
 }

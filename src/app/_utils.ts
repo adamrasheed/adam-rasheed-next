@@ -1,3 +1,9 @@
+export const PATH_NAMES = {
+  ABOUT: "About",
+  BLOG: "Blog",
+  CASE_STUDIES: "Case Studies",
+  FREELANCE: "Freelance",
+};
 export const PATHS = {
   ABOUT: "/about",
   BLOG: "/blog",
@@ -7,19 +13,19 @@ export const PATHS = {
 
 export const ROUTES = [
   {
-    label: "About",
+    label: PATH_NAMES.ABOUT,
     href: PATHS.ABOUT,
   },
   {
-    label: "Case Studies",
+    label: PATH_NAMES.CASE_STUDIES,
     href: PATHS.CASE_STUDIES,
   },
   {
-    label: "Blog",
+    label: PATH_NAMES.BLOG,
     href: PATHS.BLOG,
   },
   {
-    label: "Freelance",
+    label: PATH_NAMES.FREELANCE,
     href: PATHS.FREELANCE,
   },
 ];

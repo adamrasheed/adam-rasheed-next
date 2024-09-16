@@ -5,6 +5,7 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"]{
   title,
   subtitle,
   teaser,
+  mainImage,
   description[]{
     ...,
     _type == "image" => {
@@ -44,13 +45,18 @@ export const POSTS_PREVIEWS_QUERY = defineQuery(`*[_type == "post"]{
 
 export const SINGLE_POST_QUERY = defineQuery(`
   {
-    // Fetch the single post by its slug
     "post": *[_type == "post" && slug.current == $slug][0]{
       _id,
       title,
       slug,
       excerpt,
-      mainImage,
+      mainImage {
+        asset->{
+          url,
+          metadata
+        },
+        alt
+      },
       categories[]->{
         _id,
         title
@@ -65,25 +71,20 @@ export const SINGLE_POST_QUERY = defineQuery(`
       }
     },
     
-    // Fetch up to 3 related posts based on categories
-    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && count(*[_type == 'post' && slug.current == $slug].categories) > 0 && categories[]->_id in *[_type == 'post' && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{
+    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == "post" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{
       _id,
       title,
       slug,
-      mainImage,
       excerpt,
-      categories[]->{
-        _id,
-        title
-      },
       publishedAt
     },
     
-    // Fetch fallback posts if there are less than 3 related posts
-    "fallbackPosts": *[_type == "post" && slug.current != $slug && !(_id in path('drafts.**'))] | order(publishedAt desc)[0...3]{
+    "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{
       _id,
       title,
       slug,
+      excerpt,
+      publishedAt
     }
   }
 `);
@@ -128,6 +129,11 @@ export const HOME_QUERY = defineQuery(`{
   "caseStudies": *[_type == "caseStudy"]{
     _id,
     title,
+    slug,
+    mainImage {
+      ...,
+      metadata
+    },
     subtitle,
     teaser,
   }[0...2],
@@ -135,7 +141,40 @@ export const HOME_QUERY = defineQuery(`{
     _id,
     title,
     slug,
+    mainImage {
+      ...,
+      metadata
+    },
     excerpt,
     publishedAt,
   }[0...2]
+}`);
+
+export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{
+  _id,
+  _createdAt,
+  _updatedAt,
+  bio[]{
+    _key,
+    children[]{
+      _key,
+      _type,
+      text
+    }
+  },
+  contributions[]{
+    _key,
+    title,
+    contributions[]{
+      _key,
+      title,
+      date,
+      description,
+      link
+    }
+  },
+  mainImage {
+    ...,
+    metadata
+  },
 }`);

@@ -38,6 +38,12 @@ body {
   }
 }
 
+@layer base {
+  section {
+    @apply py-10 md:py-16 lg:py-20 xl:py-36;
+  }
+}
+
 @layer components {
   a {
     @apply font-bold transition-all hover:underline focus:underline;
@@ -104,12 +110,8 @@ body {
     letter-spacing: 0.05em;
   }
 
-  section {
-    @apply sm:py-10 md:py-16 lg:py-20 xl:py-36;
-  }
-
   .btn {
-    @apply px-6 py-2 block w-fit leading-none bg-bgSecondaryHover dark:bg-sky-900 dark:hover:bg-sky-800 dark:focus:bg-sky-800 font-semibold text-sm hover:bg-bgSecondaryHover focus:bg-bgSecondaryHover hover:text-current focus:text-current hover:no-underline focus:no-underline;
+    @apply px-6 py-2 pt-[6px] block w-fit leading-none bg-bgSecondaryHover dark:bg-sky-900 dark:hover:bg-sky-800 dark:focus:bg-sky-800 font-semibold text-sm hover:bg-bgSecondaryHover focus:bg-bgSecondaryHover hover:text-current focus:text-current hover:no-underline focus:no-underline;
 
     font-variant-caps: all-small-caps;
     letter-spacing: 0.05em;
@@ -178,7 +180,7 @@ body {
   }
 
   .case-study-preview {
-    @apply mb-16 grid;
+    @apply grid;
     grid-gap: 2rem;
   }
 
@@ -186,6 +188,7 @@ body {
     @apply block w-full;
   }
 
+  .preview-block-container,
   .case-study-preview-content {
     @apply grid gap-8 md:grid-cols-2 px-4 md:px-0;
   }

@@ -46,7 +46,7 @@ const Footer = ({
           <p className="text-sml leading-none">Adam Rasheed © {year}</p>
           {resume && (
             <a
-              className="btn lrg pt-[6px]"
+              className="btn lrg"
               href={resume}
               target="_blank"
               rel="noopener noreferrer"

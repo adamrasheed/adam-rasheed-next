@@ -23,6 +23,7 @@ const Header = ({ title }: HeaderProps) => {
       className={clsx(
         "my-8",
         "container",
+        "px-4",
         "grid",
         "gap-4",
         "items-center",
@@ -53,7 +54,15 @@ const Header = ({ title }: HeaderProps) => {
         </Link>
       </h1>
 
-      <nav className={clsx("flex", "gap-4", "justify-end", "items-center")}>
+      <nav
+        className={clsx(
+          "hidden",
+          "md:flex",
+          "gap-4",
+          "justify-end",
+          "items-center"
+        )}
+      >
         {ROUTES.map((route) => (
           <Link
             href={route.href}
