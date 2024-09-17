@@ -2,7 +2,6 @@ import { sanityFetch } from "@/sanity/lib/client";
 import type { Metadata } from "next";
 import { HOME_QUERY } from "@/sanity/queries";
 import Header from "./_components/Header";
-import { SiteInfoQueryRizzult } from "./_types";
 import Footer from "./_components/Footer";
 import { PortableText } from "@portabletext/react";
 import clsx from "clsx";
@@ -23,9 +22,9 @@ export default async function IndexPage() {
     query: HOME_QUERY,
   });
 
-  const info = siteInfo[0] as SiteInfoQueryRizzult[0];
+  if (!siteInfo) return <div>Loading...</div>;
 
-  const { title, description, resume, socialMedia } = info;
+  const { title, description, resume, socialMedia } = siteInfo;
 
   return (
     <>

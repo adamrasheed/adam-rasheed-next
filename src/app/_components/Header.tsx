@@ -4,13 +4,12 @@ import clsx from "clsx";
 import { PATHS, ROUTES } from "../_utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SITE_INFO_QUERYResult } from "../../../sanity.types";
 
 const name = "Adam Rasheed";
 
-type HeaderProps = {
-  title: string;
-};
-const Header = ({ title }: HeaderProps) => {
+type HeaderProps = Pick<NonNullable<SITE_INFO_QUERYResult>, "title">;
+const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
   const currentPathFull = usePathname();
 
   const currentPaths = currentPathFull.split("/");

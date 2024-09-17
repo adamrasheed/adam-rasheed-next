@@ -1,6 +1,10 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+library.add(faChevronRight);
 
 type PreviewBlockProps = {
   title: string;
@@ -36,7 +40,14 @@ const PreviewBlock: FC<PreviewBlockProps> = ({ title, href, children }) => {
         <Link
           className={clsx("font-bold", "small-caps", "leading-none")}
           href={href}
-        >{`More ${title} `}</Link>
+        >
+          {
+            <div className="flex justify-end items-center gap-2">
+              <span className="tracking-none">{`More ${title}`}</span>
+              <FontAwesomeIcon icon={faChevronRight} height={12} size={"sm"} />
+            </div>
+          }
+        </Link>
       </header>
       {children}
     </section>

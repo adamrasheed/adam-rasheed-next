@@ -1,22 +1,22 @@
 import clsx from "clsx";
-import { library } from "@fortawesome/fontawesome-svg-core";
+import { IconDefinition, library } from "@fortawesome/fontawesome-svg-core";
 import {
   faFacebookF,
   faInstagramSquare,
-  faTwitter,
   faInstagram,
   faYoutube,
   faLinkedinIn,
   faDribbble,
   faGithub,
+  faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SiteInfoQueryRizzult } from "../_types";
+import { SITE_INFO_QUERYResult } from "../../../sanity.types";
 
 library.add(
   faFacebookF,
   faInstagramSquare,
-  faTwitter,
+  faXTwitter,
   faInstagram,
   faLinkedinIn,
   faDribbble,
@@ -24,20 +24,37 @@ library.add(
   faYoutube
 );
 
+type SocialMediaKeys = keyof NonNullable<
+  NonNullable<SITE_INFO_QUERYResult>["socialMedia"]
+>;
+const socialMediaIconMap: Record<SocialMediaKeys, IconDefinition> = {
+  instagram: faInstagram,
+  youtube: faYoutube,
+  dribbble: faDribbble,
+  github: faGithub,
+  linkedIn: faLinkedinIn,
+  x: faXTwitter,
+};
+
 const socialHoverMap: Record<string, string> = {
   instagram: "hover:text-instagram focus:text-instagram",
   facebook: "hover:text-facebook focus:text-facebook",
   youtube: "hover:text-youtube focus:text-youtube",
   dribbble: "hover:text-dribbble focus:text-dribbble",
-  linkedin: "hover:text-linkedin focus:text-linkedin",
-  twitter: "hover:text-twitter focus:text-twitter",
+  faGithub: "hover:text-github focus:text-github",
+  linkedIn: "hover:text-linkedin focus:text-linkedin",
+  x: "hover:text-twitter focus:text-twitter",
 };
 
-const Footer = ({
-  socialMedia,
-  resume,
-}: Pick<SiteInfoQueryRizzult[0], "socialMedia" | "resume">) => {
+type FooterProps = Pick<
+  NonNullable<SITE_INFO_QUERYResult>,
+  "resume" | "socialMedia"
+>;
+
+const Footer = ({ socialMedia, resume }: FooterProps) => {
   const year = new Date().getFullYear();
+
+  const socialMediaArray = Object.entries(socialMedia || {});
 
   return (
     <footer className={clsx("py-6", "border-t")}>
@@ -55,33 +72,37 @@ const Footer = ({
             </a>
           )}
         </div>
-        <div
-          data-testid="social-media"
-          className={clsx(
-            "flex",
-            "container",
-            "justify-center",
-            "self-center",
-            "items-center",
-            "gap-6",
-            "place-items-center"
-          )}
-        >
-          {socialMedia.github && (
-            <a
-              href={socialMedia.github}
-              target="_blank"
-              rel="noreferrer"
-              title={socialMedia.github}
-            >
-              <FontAwesomeIcon
-                icon={faGithub}
-                aria-label={"github"}
-                className="footer_icon"
-              />
-            </a>
-          )}
-        </div>
+        {socialMedia && (
+          <div
+            data-testid="social-media"
+            className={clsx(
+              "flex",
+              "container",
+              "justify-center",
+              "self-center",
+              "items-center",
+              "gap-4",
+              "place-items-center"
+            )}
+          >
+            {socialMediaArray.map(([key, value]) => (
+              <a
+                key={key}
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                title={value}
+                className="min-w-6"
+              >
+                <FontAwesomeIcon
+                  icon={socialMediaIconMap[key as SocialMediaKeys]}
+                  aria-label={key}
+                  className={clsx("footer_icon", socialHoverMap[key])}
+                />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </footer>
   );

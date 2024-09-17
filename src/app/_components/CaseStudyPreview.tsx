@@ -37,7 +37,7 @@ const CaseStudyPreview: FC<CaseStudyPreviewProps> = ({
         <Link
           href={link}
           style={{ aspectRatio: `${imageProps.width} / ${imageProps.height}` }}
-          className={clsx("relative", "block", "bg-red-200", "overflow-hidden")}
+          className={clsx("relative", "block", "overflow-hidden")}
         >
           <Image
             src={imageProps.src}

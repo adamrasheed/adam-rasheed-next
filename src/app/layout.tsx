@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import "../styles/globals.css";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
 export const metadata = {
   title: "Adam Rasheed",

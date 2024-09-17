@@ -104,7 +104,7 @@ export const PAGE_QUERY = defineQuery(`
   }
 `);
 
-export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"]{
+export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"][0]{
   _id,
   title,
   email,
@@ -116,7 +116,7 @@ export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"]{
 }`);
 
 export const HOME_QUERY = defineQuery(`{
-  "siteInfo": *[_type == "siteInfo"]{
+  "siteInfo": *[_type == "siteInfo"][0]{
     _id,
     title,
     email,
@@ -155,11 +155,10 @@ export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{
   _createdAt,
   _updatedAt,
   bio[]{
-    _key,
-    children[]{
-      _key,
-      _type,
-      text
+    ...,
+    _type == "image" => {
+      "imageUrl": asset->url,
+      alt
     }
   },
   contributions[]{

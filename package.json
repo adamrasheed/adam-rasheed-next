@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typegen": "sanity schema extract --path=src/sanity/extract.json && sanity typegen generate"
+    "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

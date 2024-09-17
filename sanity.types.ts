@@ -101,6 +101,7 @@ export type SiteInfo = {
     linkedIn?: string;
     github?: string;
     youtube?: string;
+    dribbble?: string;
   };
 };
 
@@ -622,8 +623,8 @@ export type PAGE_QUERYResult = {
   }> | null;
 } | null;
 // Variable: SITE_INFO_QUERY
-// Query: *[_type == "siteInfo"]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia}
-export type SITE_INFO_QUERYResult = Array<{
+// Query: *[_type == "siteInfo"][0]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia}
+export type SITE_INFO_QUERYResult = {
   _id: string;
   title: string | null;
   email: string | null;
@@ -652,12 +653,13 @@ export type SITE_INFO_QUERYResult = Array<{
     linkedIn?: string;
     github?: string;
     youtube?: string;
+    dribbble?: string;
   } | null;
-}>;
+} | null;
 // Variable: HOME_QUERY
-// Query: {  "siteInfo": *[_type == "siteInfo"]{    _id,    title,    email,    resume,    description[]{      ...,    },    socialMedia  },  "caseStudies": *[_type == "caseStudy"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    subtitle,    teaser,  }[0...2],  "posts": *[_type == "post"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    excerpt,    publishedAt,  }[0...2]}
+// Query: {  "siteInfo": *[_type == "siteInfo"][0]{    _id,    title,    email,    resume,    description[]{      ...,    },    socialMedia  },  "caseStudies": *[_type == "caseStudy"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    subtitle,    teaser,  }[0...2],  "posts": *[_type == "post"]{    _id,    title,    slug,    mainImage {      ...,      metadata    },    excerpt,    publishedAt,  }[0...2]}
 export type HOME_QUERYResult = {
-  siteInfo: Array<{
+  siteInfo: {
     _id: string;
     title: string | null;
     email: string | null;
@@ -686,8 +688,9 @@ export type HOME_QUERYResult = {
       linkedIn?: string;
       github?: string;
       youtube?: string;
+      dribbble?: string;
     } | null;
-  }>;
+  } | null;
   caseStudies: Array<{
     _id: string;
     title: string | null;
@@ -730,21 +733,41 @@ export type HOME_QUERYResult = {
   }>;
 };
 // Variable: ABOUT_QUERY
-// Query: *[_type == "about"][0]{  _id,  _createdAt,  _updatedAt,  bio[]{    _key,    children[]{      _key,      _type,      text    }  },  contributions[]{    _key,    title,    contributions[]{      _key,      title,      date,      description,      link    }  },  mainImage {    ...,    metadata  },}
+// Query: *[_type == "about"][0]{  _id,  _createdAt,  _updatedAt,  bio[]{    ...,    _type == "image" => {      "imageUrl": asset->url,      alt    }  },  contributions[]{    _key,    title,    contributions[]{      _key,      title,      date,      description,      link    }  },  mainImage {    ...,    metadata  },}
 export type ABOUT_QUERYResult = {
   _id: string;
   _createdAt: string;
   _updatedAt: string;
   bio: Array<{
-    _key: string;
-    children: null;
-  } | {
-    _key: string;
-    children: Array<{
-      _key: string;
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
       _type: "span";
-      text: string | null;
-    }> | null;
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt: string | null;
+    _type: "image";
+    _key: string;
+    imageUrl: string | null;
   }> | null;
   contributions: Array<{
     _key: string;
@@ -782,8 +805,8 @@ declare module "@sanity/client" {
     "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n}\n": POSTS_PREVIEWS_QUERYResult;
     "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == \"post\" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    }\n  }\n": SINGLE_POST_QUERYResult;
     "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
-    "*[_type == \"siteInfo\"]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
-    "{\n  \"siteInfo\": *[_type == \"siteInfo\"]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
-    "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    _key,\n    children[]{\n      _key,\n      _type,\n      text\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
+    "*[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
+    "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
+    "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
   }
 }

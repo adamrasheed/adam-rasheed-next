@@ -61,6 +61,11 @@ export const siteInfo = defineType({
           title: "YouTube",
           type: "url",
         },
+        {
+          name: "dribbble",
+          title: "Dribbble",
+          type: "url",
+        },
       ],
     },
   ],

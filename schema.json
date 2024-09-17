@@ -599,6 +599,13 @@
                 "type": "string"
               },
               "optional": true
+            },
+            "dribbble": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string"
+              },
+              "optional": true
             }
           }
         },
