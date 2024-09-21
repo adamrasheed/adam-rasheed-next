@@ -22,7 +22,7 @@ const PreviewBlock: FC<PreviewBlockProps> = ({ title, href, children }) => {
           "items-center",
           "mb-8",
           "px-4",
-          "md:px-0"
+          "lg:px-0"
         )}
       >
         <h2

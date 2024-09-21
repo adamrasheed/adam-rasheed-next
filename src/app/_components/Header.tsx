@@ -26,7 +26,8 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
         "grid",
         "gap-4",
         "items-center",
-        "grid-cols-[auto_auto]"
+        "grid-cols-[auto_auto]",
+        "lg:px-0"
       )}
     >
       <h1>

@@ -33,11 +33,11 @@ export default async function IndexPage() {
         <div
           className={clsx(
             "container",
-            "px-0",
             "mt-10",
             "mb-20",
             "xl:mt-[8vw]",
-            "xl:mb-[10vw]"
+            "xl:mb-[10vw]",
+            "px-0"
           )}
         >
           <div
@@ -49,7 +49,7 @@ export default async function IndexPage() {
               "mb-[18vh]",
               "md:my-[15vh]",
               "px-4",
-              "md:px-0"
+              "lg:px-0"
             )}
           >
             <PortableText
