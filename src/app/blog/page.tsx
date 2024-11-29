@@ -1,12 +1,33 @@
 import { sanityFetch } from "@/sanity/lib/client";
-import { POSTS_QUERYResult } from "../../../sanity.types";
-import { POSTS_QUERY } from "@/sanity/queries";
+import {
+  CATEGORIES_QUERYResult,
+  POSTS_PREVIEW_BY_SLUG_QUERYResult,
+} from "../../../sanity.types";
+import {
+  CATEGORIES_QUERY,
+  POSTS_PREVIEW_BY_SLUG_QUERY,
+} from "@/sanity/queries";
 import PostListings from "./_components/PostListings";
 
-export default async function BlogsPage() {
-  const posts = await sanityFetch<POSTS_QUERYResult>({
-    query: POSTS_QUERY,
+type PageProps = {
+  searchParams: {
+    category?: string;
+  };
+};
+
+export default async function BlogsPage({ searchParams }: PageProps) {
+  const { category } = searchParams;
+
+  const categories = await sanityFetch<CATEGORIES_QUERYResult>({
+    query: CATEGORIES_QUERY,
   });
 
-  return <PostListings posts={posts} />;
+  const posts = await sanityFetch<POSTS_PREVIEW_BY_SLUG_QUERYResult>({
+    query: POSTS_PREVIEW_BY_SLUG_QUERY,
+    params: {
+      categorySlug: category || null,
+    },
+  });
+
+  return <PostListings posts={posts} categories={categories} />;
 }

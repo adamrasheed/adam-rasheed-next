@@ -1,12 +1,15 @@
-import { SanityPage } from "@/app/_types";
 import clsx from "clsx";
 import { PortableText } from "next-sanity";
+import { PAGE_QUERYResult } from "../../../../sanity.types";
+import { FC } from "react";
 
-const Page = ({ page }: { page: SanityPage }) => {
+type PageProps = NonNullable<PAGE_QUERYResult>;
+
+const Page: FC<PageProps> = ({ title, body }) => {
   return (
     <div>
-      <h1 className={clsx("text-lg", "mb-4", "md:mb-8")}>{page.title}</h1>
-      {page.body && <PortableText value={page.body} />}
+      <h1 className={clsx("page-title")}>{title}</h1>
+      {body && <PortableText value={body} />}
     </div>
   );
 };

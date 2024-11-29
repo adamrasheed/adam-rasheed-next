@@ -39,6 +39,11 @@ export const POSTS_PREVIEWS_QUERY = defineQuery(`*[_type == "post"]{
   title,
   slug,
   excerpt,
+  categories[]->{
+    _id,
+    title,
+    slug
+  },
   publishedAt,
 }
 `);
@@ -176,4 +181,28 @@ export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{
     ...,
     metadata
   },
+}`);
+
+export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"]{
+  _id,
+  title,
+  "slug": slug.current
+}
+`);
+
+export const POSTS_PREVIEW_BY_SLUG_QUERY = defineQuery(`*[
+  _type == "post" && 
+  ($categorySlug == null || $categorySlug in categories[]->slug.current)
+]{
+  _id,
+  title,
+  slug,
+  excerpt,
+  mainImage,
+  categories[]->{
+    _id,
+    title,
+    "slug": slug.current
+  },
+  publishedAt,
 }`);

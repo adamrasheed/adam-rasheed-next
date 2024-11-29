@@ -515,12 +515,17 @@ export type POSTS_QUERYResult = Array<{
   publishedAt: string | null;
 }>;
 // Variable: POSTS_PREVIEWS_QUERY
-// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  publishedAt,}
+// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}
 export type POSTS_PREVIEWS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
   excerpt: string | null;
+  categories: Array<{
+    _id: string;
+    title: string | null;
+    slug: Slug | null;
+  }> | null;
   publishedAt: string | null;
 }>;
 // Variable: SINGLE_POST_QUERY
@@ -794,6 +799,39 @@ export type ABOUT_QUERYResult = {
     metadata: null;
   } | null;
 } | null;
+// Variable: CATEGORIES_QUERY
+// Query: *[_type == "category"]{  _id,  title,  "slug": slug.current}
+export type CATEGORIES_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+}>;
+// Variable: POSTS_PREVIEW_BY_SLUG_QUERY
+// Query: *[  _type == "post" &&   ($categorySlug == null || $categorySlug in categories[]->slug.current)]{  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    "slug": slug.current  },  publishedAt,}
+export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  excerpt: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  categories: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  }> | null;
+  publishedAt: string | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -802,11 +840,13 @@ declare module "@sanity/client" {
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  mainImage,\n  description[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  }\n}\n": CASE_STUDIES_QUERYResult;
     "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n}\n": CASE_STUDIES_PREVIEW_QUERYResult;
     "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  publishedAt,\n}\n": POSTS_QUERYResult;
-    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  publishedAt,\n}\n": POSTS_PREVIEWS_QUERYResult;
+    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}\n": POSTS_PREVIEWS_QUERYResult;
     "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == \"post\" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    }\n  }\n": SINGLE_POST_QUERYResult;
     "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
     "*[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
     "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n    _id,\n    title,\n    email,\n    resume,\n    description[]{\n      ...,\n    },\n    socialMedia\n  },\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    subtitle,\n    teaser,\n  }[0...2],\n  \"posts\": *[_type == \"post\"]{\n    _id,\n    title,\n    slug,\n    mainImage {\n      ...,\n      metadata\n    },\n    excerpt,\n    publishedAt,\n  }[0...2]\n}": HOME_QUERYResult;
     "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
+    "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
+    "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
   }
 }

@@ -17,5 +17,5 @@ export default async function PagePage({
 
   if (!page) return null;
 
-  return <Page page={page} />;
+  return <Page {...page} />;
 }

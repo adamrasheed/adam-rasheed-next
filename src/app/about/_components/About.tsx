@@ -17,7 +17,7 @@ const About: FC<AboutProps> = ({
 }) => {
   const imageProps = useNextSanityImage(client, mainImage);
 
-  const hasBio = bio && bio.length > 0;
+  // const hasBio = bio && bio.length > 0;
   const hasContributions = contributions && contributions.length > 0;
   const updatedAt = _updatedAt;
 
@@ -45,7 +45,7 @@ const About: FC<AboutProps> = ({
         <div>
           {bio && (
             <>
-              <article className={clsx("prose")}>
+              <article className={clsx("prose", "dark:prose-invert")}>
                 <PortableText value={bio} />
               </article>
               {updatedAt && (

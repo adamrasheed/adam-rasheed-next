@@ -5,7 +5,7 @@ export const metadata = {
   description: "Adam Rasheed blog about software engineering, travel, and more",
 };
 
-export default async function BlogLayout({
+export default async function CaseStudiesLayout({
   children,
 }: {
   children: React.ReactNode;
