@@ -15,7 +15,7 @@
   --youtube: #ff0000;
   --dribbble: #e43b81;
   --linkedin: #0076b5;
-  --twitter: #1da1f2;
+  --x: #000;
   --shopify: #96bf48;
 }
 
@@ -40,7 +40,7 @@ body {
 
 @layer base {
   section {
-    @apply py-10 md:py-16 lg:py-20 xl:py-36;
+    @apply py-10 md:py-16 lg:py-20 xl:py-24;
   }
 }
 
@@ -294,5 +294,9 @@ body {
   .small-caps {
     font-variant-caps: all-small-caps;
     letter-spacing: 0.05em;
+  }
+
+  .container.sml {
+    max-width: 50rem;
   }
 }

@@ -10,6 +10,8 @@ import PreviewBlock from "./_components/PreviewBlock";
 import { getFormattedDate, PATH_NAMES, PATHS } from "./_utils";
 import Link from "next/link";
 import CaseStudyPreview from "./_components/CaseStudyPreview";
+import SanityImage from "./_components/SanityImage";
+import PostPreview from "./blog/_components/PostPreview";
 
 export const metadata: Metadata = {
   title: "Adam Rasheed | Software Engineer",
@@ -52,18 +54,33 @@ export default async function IndexPage() {
               "lg:px-0"
             )}
           >
-            <PortableText
-              value={description}
-              components={{
-                block: {
-                  h1: ({ children }) => (
-                    <h1 className={clsx("font-black", "text-4xl")}>
-                      {children}
-                    </h1>
-                  ),
-                },
-              }}
-            />
+            {description && (
+              <PortableText
+                value={description}
+                components={{
+                  types: {
+                    image: ({ value }) => <SanityImage img={value} />,
+                    link: ({ value, renderNode, isInline }) => {
+                      console.log(value, renderNode, isInline);
+                      return <p>HELLO</p>;
+                    },
+                  },
+
+                  block: {
+                    h1: ({ children }) => (
+                      <h1 className={clsx("font-black", "text-4xl")}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={clsx("font-black", "text-3xl")}>
+                        {children}
+                      </h2>
+                    ),
+                  },
+                }}
+              />
+            )}
           </div>
           <PreviewBlock
             title={PATH_NAMES.CASE_STUDIES}
@@ -78,25 +95,7 @@ export default async function IndexPage() {
           <PreviewBlock title={PATH_NAMES.BLOG} href={PATHS.BLOG}>
             <div className="preview-block-container">
               {posts.map((post) => (
-                <div key={post._id} className="preview-block">
-                  <h2 className="text-xl font-bold mb-2">
-                    <Link
-                      href={
-                        post.slug?.current
-                          ? `${PATHS.BLOG}/${post.slug.current}`
-                          : "/"
-                      }
-                    >
-                      {post.title}
-                    </Link>
-                  </h2>
-                  <p className="text-sm">{post.excerpt}</p>
-                  {post.publishedAt && (
-                    <p className="small-caps mt-2">
-                      {getFormattedDate(post.publishedAt)}
-                    </p>
-                  )}
-                </div>
+                <PostPreview key={post._id} {...post} />
               ))}
             </div>
           </PreviewBlock>

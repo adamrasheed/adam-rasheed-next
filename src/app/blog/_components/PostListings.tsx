@@ -15,7 +15,7 @@ type PostListingsProps = {
 const PostListings: FC<PostListingsProps> = ({ categories, posts }) => {
   return (
     <div>
-      <h1 className="page-title">{"Case Studies"}</h1>
+      <h1 className="page-title">{"Blog"}</h1>
       <PostCategories categories={categories} />
 
       <div

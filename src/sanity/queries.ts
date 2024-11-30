@@ -1,40 +1,54 @@
 import { defineQuery } from "next-sanity";
 
+export const DESCRIPTION_FIELD = `{
+  ...,
+  _type == "image" => {
+    "imageUrl": asset->url,
+    alt
+  }
+}`;
+
+export const CASE_STUDY_PREVIEW_FIELDS = `{
+  _id,
+  title,
+  subtitle,
+  teaser,
+  slug,
+  mainImage {
+    ...,
+    metadata
+  }
+}`;
+
 export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"]{
   _id,
   title,
   subtitle,
   teaser,
   mainImage,
-  description[]{
-    ...,
-    _type == "image" => {
-      "imageUrl": asset->url,
-      alt
-    }
-  }
+  description[]${DESCRIPTION_FIELD},
 }
 `);
 
-export const CASE_STUDIES_PREVIEW_QUERY = defineQuery(`*[_type == "caseStudy"]{
+export const CASE_STUDIES_PREVIEW_QUERY = defineQuery(
+  `*[_type == "caseStudy"]${CASE_STUDY_PREVIEW_FIELDS}`
+);
+
+export const CASE_STUDY_BY_SLUG_QUERY =
+  defineQuery(`*[_type == "caseStudy" && slug.current == $slug][0]{
   _id,
   title,
   subtitle,
   teaser,
-}
-`);
-
-export const POSTS_QUERY = defineQuery(`*[_type == "post"]{
-  _id,
-  title,
   slug,
-  excerpt,
-  mainImage,
-  publishedAt,
-}
-`);
+  mainImage {
+    ...,
+    metadata
+  },
+  description[]${DESCRIPTION_FIELD},
+}`);
 
-export const POSTS_PREVIEWS_QUERY = defineQuery(`*[_type == "post"]{
+const POST_PREVIEW_FIELDS = `{
   _id,
   title,
   slug,
@@ -45,8 +59,11 @@ export const POSTS_PREVIEWS_QUERY = defineQuery(`*[_type == "post"]{
     slug
   },
   publishedAt,
-}
-`);
+}`;
+
+export const POSTS_PREVIEWS_QUERY = defineQuery(
+  `*[_type == "post"]${POST_PREVIEW_FIELDS}`
+);
 
 export const SINGLE_POST_QUERY = defineQuery(`
   {
@@ -109,7 +126,7 @@ export const PAGE_QUERY = defineQuery(`
   }
 `);
 
-export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"][0]{
+export const SITE_INFO_FIELDS = `{
   _id,
   title,
   email,
@@ -118,41 +135,16 @@ export const SITE_INFO_QUERY = defineQuery(`*[_type == "siteInfo"][0]{
     ...,
   },
   socialMedia
-}`);
+}`;
+
+export const SITE_INFO_QUERY_FIELDS = `*[_type == "siteInfo"][0]${SITE_INFO_FIELDS}`;
+
+export const SITE_INFO_QUERY = defineQuery(SITE_INFO_QUERY_FIELDS);
 
 export const HOME_QUERY = defineQuery(`{
-  "siteInfo": *[_type == "siteInfo"][0]{
-    _id,
-    title,
-    email,
-    resume,
-    description[]{
-      ...,
-    },
-    socialMedia
-  },
-  "caseStudies": *[_type == "caseStudy"]{
-    _id,
-    title,
-    slug,
-    mainImage {
-      ...,
-      metadata
-    },
-    subtitle,
-    teaser,
-  }[0...2],
-  "posts": *[_type == "post"]{
-    _id,
-    title,
-    slug,
-    mainImage {
-      ...,
-      metadata
-    },
-    excerpt,
-    publishedAt,
-  }[0...2]
+  "siteInfo": ${SITE_INFO_QUERY_FIELDS},
+  "caseStudies": *[_type == "caseStudy"]${CASE_STUDY_PREVIEW_FIELDS}[0...2],
+  "posts": *[_type == "post"]${POST_PREVIEW_FIELDS}[0...2],
 }`);
 
 export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{

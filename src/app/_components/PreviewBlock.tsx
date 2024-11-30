@@ -44,7 +44,12 @@ const PreviewBlock: FC<PreviewBlockProps> = ({ title, href, children }) => {
           {
             <div className="flex justify-end items-center gap-2">
               <span className="tracking-none">{`More ${title}`}</span>
-              <FontAwesomeIcon icon={faChevronRight} height={12} size={"sm"} />
+              <FontAwesomeIcon
+                className="translate-y-[1px]"
+                icon={faChevronRight}
+                height={8}
+                size={"xs"}
+              />
             </div>
           }
         </Link>

@@ -43,7 +43,7 @@ const socialHoverMap: Record<string, string> = {
   dribbble: "hover:text-dribbble focus:text-dribbble",
   faGithub: "hover:text-github focus:text-github",
   linkedIn: "hover:text-linkedin focus:text-linkedin",
-  x: "hover:text-twitter focus:text-twitter",
+  x: "hover:text-x focus:text-x",
 };
 
 type FooterProps = Pick<

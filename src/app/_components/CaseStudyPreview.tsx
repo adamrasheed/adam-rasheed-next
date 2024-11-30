@@ -1,8 +1,10 @@
 "use server";
 
 import { FC } from "react";
-import { SanityMainImage } from "../_types";
-import { HOME_QUERYResult } from "../../../sanity.types";
+import {
+  CASE_STUDIES_PREVIEW_QUERYResult,
+  HOME_QUERYResult,
+} from "../../../sanity.types";
 import { useNextSanityImage } from "next-sanity-image";
 import { client } from "@/sanity/lib/client";
 import clsx from "clsx";
@@ -10,15 +12,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { PATHS } from "../_utils";
 
-type CaseStudyPreviewProps = Omit<
-  HOME_QUERYResult["caseStudies"][0],
-  "mainImage" | "slug"
-> & {
-  mainImage: SanityMainImage | null;
-  slug: {
-    current?: string;
-  } | null;
-};
+type CaseStudyPreviewProps =
+  | HOME_QUERYResult["caseStudies"][0]
+  | CASE_STUDIES_PREVIEW_QUERYResult[0];
 const CaseStudyPreview: FC<CaseStudyPreviewProps> = ({
   title,
   mainImage,
@@ -41,7 +37,6 @@ const CaseStudyPreview: FC<CaseStudyPreviewProps> = ({
         >
           <Image
             src={imageProps.src}
-            // loader={imageProps.loader}
             layout="fill"
             alt={mainImage?.alt || ""}
             style={{

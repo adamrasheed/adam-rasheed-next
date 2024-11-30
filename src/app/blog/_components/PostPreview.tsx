@@ -1,9 +1,14 @@
 import { FC } from "react";
 import Link from "next/link";
 import { getFormattedDate, PATHS } from "@/app/_utils";
-import { POSTS_PREVIEW_BY_SLUG_QUERYResult } from "../../../../sanity.types";
+import {
+  HOME_QUERYResult,
+  POSTS_PREVIEW_BY_SLUG_QUERYResult,
+} from "../../../../sanity.types";
 
-type PostPreviewProps = POSTS_PREVIEW_BY_SLUG_QUERYResult[0];
+type PostPreviewProps =
+  | POSTS_PREVIEW_BY_SLUG_QUERYResult[0]
+  | HOME_QUERYResult["posts"][0];
 
 const PostPreview: FC<PostPreviewProps> = ({
   categories,
