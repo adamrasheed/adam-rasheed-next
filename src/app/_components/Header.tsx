@@ -31,7 +31,15 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
       )}
     >
       <h1>
-        <Link href="/" className={clsx("flex", "items-center", "gap-1")}>
+        <Link
+          href="/"
+          className={clsx(
+            "flex",
+            "items-center",
+            "gap-1",
+            "hover:no-underline"
+          )}
+        >
           <span
             className={clsx(
               "font-bold",

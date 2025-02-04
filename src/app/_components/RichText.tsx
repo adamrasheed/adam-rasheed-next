@@ -1,9 +1,4 @@
-import {
-  PortableText,
-  PortableTextComponent,
-  PortableTextComponentProps,
-} from "next-sanity";
-import { FC } from "react";
+import { PortableText } from "next-sanity";
 import SanityImage from "./SanityImage";
 import clsx from "clsx";
 import { TypedObject } from "sanity";

@@ -24,10 +24,6 @@ export const ROUTES = [
     label: PATH_NAMES.BLOG,
     href: PATHS.BLOG,
   },
-  {
-    label: PATH_NAMES.FREELANCE,
-    href: PATHS.FREELANCE,
-  },
 ];
 
 export const getFormattedDate = (date: string) => {
