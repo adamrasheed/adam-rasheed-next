@@ -1,7 +1,7 @@
 import { PortableTextBlock } from "@portabletext/types";
 import { SanityImageObject } from "@sanity/image-url/lib/types/types";
 import { EncodeDataAttributeCallback } from "@sanity/react-loader";
-import { image } from "@/sanity/lib/client";
+// import { image } from "@/sanity/lib/client";
 
 import Blocks from "./Blocks";
 
@@ -32,13 +32,13 @@ export default function SectionImage({
         className="..."
         data-sanity={sanity?.([`body:${_key}`, "image", "image"])}
       >
-        <img
+        {/* <img
           src={image(source.image)}
           width={400}
           height={1000}
           className="absolute h-full w-full object-cover"
           style={hotspot}
-        />
+        /> */}
       </div>
       <div className="...">
         <Blocks value={richtext} />
