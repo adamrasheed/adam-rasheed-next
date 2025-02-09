@@ -7,7 +7,7 @@ type PageProps = NonNullable<PAGE_QUERYResult>;
 
 const Page: FC<PageProps> = ({ title, body }) => {
   return (
-    <div>
+    <div className="prose dark:prose-invert">
       <h1 className={clsx("page-title")}>{title}</h1>
       {body && <PortableText value={body} />}
     </div>
