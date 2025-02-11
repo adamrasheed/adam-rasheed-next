@@ -5,21 +5,32 @@ import { PATHS, ROUTES } from "../_utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_INFO_QUERYResult } from "../../../sanity.types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
+import { showUnderline } from "./utils";
+import MobileNav from "./MobileNav";
 
 const name = "Adam Rasheed";
 
 type HeaderProps = Pick<NonNullable<SITE_INFO_QUERYResult>, "title">;
 const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
   const currentPathFull = usePathname();
+  const [isMenuShowing, setIsMenuShowing] = useState(false);
 
   const currentPaths = currentPathFull.split("/");
   const isBlog = currentPaths.includes("blog");
   const isCaseStudy = currentPaths.includes("case-studies");
   const currentPath = currentPaths.pop();
 
+  const handleMenuToggle = () => {
+    setIsMenuShowing((prev: boolean) => !prev);
+  };
+
   return (
     <header
       className={clsx(
+        "relative",
         "my-8",
         "container",
         "px-4",
@@ -62,6 +73,20 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
         </Link>
       </h1>
 
+      <button
+        className="w-fit justify-self-end md:hidden"
+        onClick={handleMenuToggle}
+      >
+        <FontAwesomeIcon icon={faBars} />
+      </button>
+
+      <MobileNav
+        isShowing={isMenuShowing}
+        currentPath={currentPath}
+        isBlog={isBlog}
+        isCaseStudy={isCaseStudy}
+      />
+
       <nav
         className={clsx(
           "hidden",
@@ -81,10 +106,12 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
               "letter-spacing",
               "small-caps",
               {
-                [`underline`]:
-                  currentPath === route.href.split("/").pop() ||
-                  (route.href === PATHS.BLOG && isBlog) ||
-                  (route.href === PATHS.CASE_STUDIES && isCaseStudy),
+                [`underline`]: showUnderline({
+                  currentPath,
+                  href: route.href,
+                  isBlog,
+                  isCaseStudy,
+                }),
               }
             )}
           >
