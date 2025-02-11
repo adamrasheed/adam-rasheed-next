@@ -27,9 +27,11 @@ export default async function IndexPage() {
 
   const { title, description, resume, socialMedia } = siteInfo;
 
+  console.log("yo", socialMedia);
+
   return (
     <>
-      <Header title={title} />
+      <Header title={title} socialMedia={socialMedia} />
       <main className={clsx("flex-1")}>
         <div
           className={clsx(

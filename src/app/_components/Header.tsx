@@ -1,22 +1,31 @@
 "use client";
 
 import clsx from "clsx";
-import { PATHS, ROUTES } from "../_utils";
+import { ROUTES } from "../_utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_INFO_QUERYResult } from "../../../sanity.types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { showUnderline } from "./utils";
 import MobileNav from "./MobileNav";
 
 const name = "Adam Rasheed";
 
-type HeaderProps = Pick<NonNullable<SITE_INFO_QUERYResult>, "title">;
-const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
+type HeaderProps = Pick<
+  NonNullable<SITE_INFO_QUERYResult>,
+  "title" | "socialMedia"
+>;
+const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
   const currentPathFull = usePathname();
   const [isMenuShowing, setIsMenuShowing] = useState(false);
+
+  const headerRef = useRef<HTMLHeadingElement>(null);
+
+  const headerHeight = headerRef.current?.clientHeight || 0;
+
+  console.log("headerHeight", headerHeight);
 
   const currentPaths = currentPathFull.split("/");
   const isBlog = currentPaths.includes("blog");
@@ -29,11 +38,12 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
 
   return (
     <header
+      ref={headerRef}
       className={clsx(
         "relative",
-        "my-8",
         "container",
         "px-4",
+        "py-8",
         "grid",
         "gap-4",
         "items-center",
@@ -85,6 +95,8 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
         currentPath={currentPath}
         isBlog={isBlog}
         isCaseStudy={isCaseStudy}
+        socialMedia={socialMedia}
+        headerHeight={headerHeight}
       />
 
       <nav
