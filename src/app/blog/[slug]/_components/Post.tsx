@@ -37,19 +37,21 @@ const Post = ({
   ];
 
   return (
-    <div className={clsx("post-container")}>
-      <div className="grid gap-8">
-        <BreadCrumbs breadcrumbs={breadCrumbs} />
-        <article className="prose dark:prose-invert md:mb-16">
-          <h1>{title}</h1>
-          {publishedAt && (
-            <p className="small-caps">{getFormattedDate(publishedAt)}</p>
-          )}
-          {body && <PortableText value={body} />}
-        </article>
+    <>
+      <BreadCrumbs breadcrumbs={breadCrumbs} />
+      <div className={clsx("post-container")}>
+        <div className="grid gap-8">
+          <article className="prose dark:prose-invert md:mb-16">
+            <h1>{title}</h1>
+            {publishedAt && (
+              <p className="small-caps">{getFormattedDate(publishedAt)}</p>
+            )}
+            {body && <PortableText value={body} />}
+          </article>
+        </div>
+        <PostSidebar posts={relatedPosts} />
       </div>
-      <PostSidebar posts={relatedPosts} />
-    </div>
+    </>
   );
 };
 

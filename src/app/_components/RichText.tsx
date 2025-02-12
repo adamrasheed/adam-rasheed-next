@@ -6,11 +6,13 @@ import { TypedObject } from "sanity";
 type RichTextProps<TValue extends TypedObject | TypedObject[]> = {
   content: TValue;
   className?: string;
+  imgClassName?: string;
 };
 
 const RichText = <TValue extends TypedObject | TypedObject[]>({
   content,
   className,
+  imgClassName,
 }: RichTextProps<TValue>) => {
   return (
     <div className={clsx("prose dark:prose-invert", className)}>
@@ -18,7 +20,9 @@ const RichText = <TValue extends TypedObject | TypedObject[]>({
         value={content}
         components={{
           types: {
-            image: ({ value }) => <SanityImage img={value} />,
+            image: ({ value }) => (
+              <SanityImage img={value} className={imgClassName} />
+            ),
           },
           block: {
             h1: ({ children }) => (

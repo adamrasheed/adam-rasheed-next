@@ -15,7 +15,7 @@ const PostSidebar = ({ posts }: { posts: SidebarPostsType }) => {
         "space-y-4",
         "max-w-[16rem]",
         "md:sticky",
-        "md:top-8",
+        "md:top-12",
         "md:place-self-start"
       )}
     >

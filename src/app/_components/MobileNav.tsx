@@ -76,7 +76,7 @@ const MobileNav: FC<MobileNavProps> = ({
       data-testid="mobileNav"
       style={{
         top: headerHeight ? `${headerHeight}px` : "0px",
-        height: `calc(100vh - ${headerHeight}px)`,
+        height: `calc(100svh - ${headerHeight}px)`,
       }}
       className={clsx(
         "flex",

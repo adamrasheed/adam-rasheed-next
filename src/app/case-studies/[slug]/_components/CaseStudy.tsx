@@ -26,7 +26,7 @@ const CaseStudy: FC<CaseStudyProps> = ({ title, mainImage, description }) => {
   ];
 
   return (
-    <div className="container">
+    <div className="container lg:px-0">
       <BreadCrumbs breadcrumbs={breadCrumbs} />
       <p className="my-2 small-caps">Case Study</p>
       <h1 className="page-title">{title}</h1>
@@ -47,8 +47,12 @@ const CaseStudy: FC<CaseStudyProps> = ({ title, mainImage, description }) => {
       )}
 
       {description && (
-        <div className="container prose dark:prose-invert sml my-16">
-          <RichText content={description} />
+        <div className="sml my-16 lg:mb-24">
+          <RichText
+            className="mx-auto prose-images"
+            imgClassName="prose-image"
+            content={description}
+          />
         </div>
       )}
     </div>

@@ -19,8 +19,8 @@ const CaseStudiesListings: FC<CaseStudiesListingsProps> = ({ caseStudies }) => {
 
   return (
     <div>
-      <h1 className="page-title">{"Case Studies"}</h1>
-      <div className={clsx("container", "lg:px-0", "grid", "gap-8")}>
+      <h1 className="page-title px-8 lg:px-0">{"Case Studies"}</h1>
+      <div className={clsx("container", "px-0", "grid", "gap-8")}>
         {caseStudies.map((caseStudy) => (
           <CaseStudyPreview key={caseStudy._id} {...caseStudy} />
         ))}

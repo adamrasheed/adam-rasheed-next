@@ -20,8 +20,8 @@ const PreviewBlock: FC<PreviewBlockProps> = ({ title, href, children }) => {
           "flex",
           "justify-between",
           "items-center",
-          "mb-8",
-          "px-4",
+          "mb-4",
+          "px-8",
           "lg:px-0"
         )}
       >

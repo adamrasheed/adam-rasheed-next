@@ -8,12 +8,13 @@ export type BreadCrumbType = { title: string; href?: string };
 
 type BreadCrumbsProps = {
   breadcrumbs: BreadCrumbType[];
+  className?: string;
 };
 
-const BreadCrumbs: FC<BreadCrumbsProps> = ({ breadcrumbs }) => {
+const BreadCrumbs: FC<BreadCrumbsProps> = ({ breadcrumbs, className }) => {
   return (
-    <div>
-      <ul className="flex gap-2 mb-4 items-center">
+    <div className={clsx("mb-8", className)}>
+      <ul className="flex gap-2 items-center">
         {breadcrumbs.map((link, idx) => (
           <li
             key={`${link.title}_${idx}`}

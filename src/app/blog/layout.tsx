@@ -10,5 +10,5 @@ export default async function BlogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <PageWrapper>{children}</PageWrapper>;
+  return <PageWrapper className="px-8 lg:px-0">{children}</PageWrapper>;
 }

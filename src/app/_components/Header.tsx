@@ -40,8 +40,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
       className={clsx(
         "relative",
         "container",
-        "px-4",
-        "py-8",
+        "p-8",
         "grid",
         "gap-4",
         "items-center",

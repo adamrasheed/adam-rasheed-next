@@ -49,7 +49,7 @@ export default async function IndexPage() {
               "mt-[12vh]",
               "mb-[18vh]",
               "md:my-[15vh]",
-              "px-4",
+              "px-8",
               "lg:px-0"
             )}
           >
