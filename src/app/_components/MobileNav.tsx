@@ -87,8 +87,7 @@ const MobileNav: FC<MobileNavProps> = ({
         "w-full",
         "transition-all",
         "duration-300",
-        "bg-white",
-        "text-black",
+        "bg-background",
         "md:hidden",
         className,
         {
@@ -114,7 +113,6 @@ const MobileNav: FC<MobileNavProps> = ({
             className={clsx(
               "font-normal",
               "text-sm",
-              "letter-spacing",
               "small-caps",
               itemClassName,
               {
