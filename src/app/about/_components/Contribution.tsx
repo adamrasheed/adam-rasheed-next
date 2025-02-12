@@ -44,7 +44,7 @@ const Contribution: FC<ContributionProps> = ({
               ) : (
                 <p className="text-sm font-semibold">{c.title}</p>
               )}
-              <p className="small-caps">{c.description}</p>
+              <p className="small-caps text-sm">{c.description}</p>
             </div>
           ))}
       </div>

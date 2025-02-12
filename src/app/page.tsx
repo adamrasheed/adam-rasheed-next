@@ -27,8 +27,6 @@ export default async function IndexPage() {
 
   const { title, description, resume, socialMedia } = siteInfo;
 
-  console.log("yo", socialMedia);
-
   return (
     <>
       <Header title={title} socialMedia={socialMedia} />

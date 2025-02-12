@@ -25,8 +25,6 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
 
   const headerHeight = headerRef.current?.clientHeight || 0;
 
-  console.log("headerHeight", headerHeight);
-
   const currentPaths = currentPathFull.split("/");
   const isBlog = currentPaths.includes("blog");
   const isCaseStudy = currentPaths.includes("case-studies");

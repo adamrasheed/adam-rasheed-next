@@ -30,7 +30,6 @@ const MobileNav: FC<MobileNavProps> = ({
 }) => {
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  console.log(socialMedia);
 
   useEffect(() => {
     if (isShowing) {
