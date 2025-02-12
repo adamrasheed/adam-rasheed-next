@@ -32,6 +32,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.prose-images .prose-image {
+  max-width: 100%;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -181,8 +185,7 @@ body {
   }
 
   .case-study-preview {
-    @apply grid;
-    grid-gap: 2rem;
+    @apply grid gap-4;
   }
 
   .case-study-preview-image {
@@ -191,7 +194,7 @@ body {
 
   .preview-block-container,
   .case-study-preview-content {
-    @apply grid gap-8 md:grid-cols-2 px-4 md:px-0;
+    @apply grid gap-4 md:grid-cols-2 px-8 md:px-0;
   }
 
   .case-study-preview-title {
@@ -225,7 +228,7 @@ body {
   }
 
   .post-container {
-    @apply container px-0 my-4 md:my-6 grid gap-8 md:grid-cols-[1fr_auto];
+    @apply container px-0 mb-8 md:mb-8 grid gap-8 md:grid-cols-[1fr_auto];
   }
 
   .page-content {

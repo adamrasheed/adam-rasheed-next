@@ -13,7 +13,5 @@ export default async function CaseStudiePage({
     return null;
   }
 
-  console.log(caseStudy);
-
   return <CaseStudy {...caseStudy} />;
 }

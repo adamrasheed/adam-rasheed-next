@@ -8,8 +8,9 @@ import clsx from "clsx";
 type SanityImageProps = {
   img: SanityMainImage;
   alt?: string;
+  className?: string;
 };
-const SanityImage: FC<SanityImageProps> = ({ img, alt = "" }) => {
+const SanityImage: FC<SanityImageProps> = ({ img, alt = "", className }) => {
   const imageProps = useNextSanityImage(client, img);
 
   if (!imageProps) return null;
@@ -17,7 +18,7 @@ const SanityImage: FC<SanityImageProps> = ({ img, alt = "" }) => {
   return (
     <div
       style={{ aspectRatio: `${imageProps.width} / ${imageProps.height}` }}
-      className={clsx("relative", "block", "overflow-hidden")}
+      className={clsx("relative", "block", "overflow-hidden", className)}
     >
       <Image
         src={imageProps.src}

@@ -10,5 +10,5 @@ export default async function CaseStudiesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <PageWrapper>{children}</PageWrapper>;
+  return <PageWrapper className="px-0">{children}</PageWrapper>;
 }
