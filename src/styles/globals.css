@@ -46,6 +46,11 @@ body {
   section {
     @apply py-10 md:py-16 lg:py-20 xl:py-24;
   }
+
+  .dark {
+    color: var(--foreground);
+    background: var(--background);
+  }
 }
 
 @layer components {
@@ -74,9 +79,8 @@ body {
   }
 
   label {
-    @apply block text-xs mb-1;
+    @apply block text-xs mb-1 tracking-wider;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .header {
@@ -115,10 +119,8 @@ body {
   }
 
   .btn {
-    @apply px-6 py-2 pt-[6px] block w-fit leading-none bg-bgSecondaryHover dark:bg-sky-900 dark:hover:bg-sky-800 dark:focus:bg-sky-800 font-semibold text-sm hover:bg-bgSecondaryHover focus:bg-bgSecondaryHover hover:text-current focus:text-current hover:no-underline focus:no-underline;
-
+    @apply px-6 py-2 pt-[6px] block w-fit tracking-wider leading-none bg-bgSecondaryHover dark:bg-sky-900 dark:hover:bg-sky-800 dark:focus:bg-sky-800 font-semibold text-sm hover:bg-bgSecondaryHover focus:bg-bgSecondaryHover hover:text-current focus:text-current hover:no-underline focus:no-underline;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .btn.primary {
@@ -153,9 +155,8 @@ body {
   }
 
   .preview-category-title {
-    @apply text-lg font-bold;
+    @apply text-lg font-bold tracking-wider;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .accent::after,
@@ -177,11 +178,8 @@ body {
   }
 
   .preview-category-link {
-    align-self: center;
-    display: block;
-    width: fit-content;
+    @apply block self-center w-fit tracking-wider;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .case-study-preview {
@@ -206,9 +204,8 @@ body {
   }
 
   .case-study-overview {
-    @apply text-sm;
+    @apply text-sm tracking-wider;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .case-study-subtitle {
@@ -220,7 +217,8 @@ body {
   }
 
   .page-title {
-    @apply text-4xl font-bold mb-8;
+    @apply text-2xl font-medium mb-8 tracking-wider;
+    font-variant-caps: all-small-caps;
   }
 
   .page-container {
@@ -259,10 +257,9 @@ body {
   }
 
   .post-preview-date {
-    @apply text-base;
+    @apply text-base tracking-wider;
     font-family: -apple-system-caption1, sans-serif;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   figcaption {
@@ -282,16 +279,9 @@ body {
     @apply font-semibold mb-4 leading-none;
   }
 
-  .post-article {
-  }
-
-  .sidebar {
-  }
-
   .affiliate_disclaimer {
-    @apply text-xs text-gray-500 mx-4 my-1;
+    @apply text-xs text-gray-500 mx-4 my-1 tracking-wder;
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.05em;
   }
 
   .small-caps {

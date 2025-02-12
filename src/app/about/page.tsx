@@ -12,7 +12,7 @@ export default async function AboutPage() {
   if (!aboutProps) return <p>No response</p>;
 
   return (
-    <PageWrapper>
+    <PageWrapper className="px-8 lg:px-0">
       <About {...aboutProps} />
     </PageWrapper>
   );

@@ -52,29 +52,32 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
         <Link
           href="/"
           className={clsx(
-            "flex",
+            "grid",
             "items-center",
-            "gap-1",
+            "md:flex",
+            "md:gap-1",
             "hover:no-underline"
           )}
         >
           <span
             className={clsx(
               "font-bold",
-              "text-xl",
-              'after:content-[""]',
-              "after:h-4",
-              "after:w-px",
-              "after:inline-block",
-              "after:bg-current",
-              "after:mr-1",
-              "after:ml-[8px]",
+              "text-lg",
+              "leading-none",
+              "md:text-xl",
+              'md:after:content-[""]',
+              "md:after:h-4",
+              "md:after:w-px",
+              "md:after:inline-block",
+              "md:after:bg-current",
+              "md:after:mr-1",
+              "md:after:ml-[8px]",
               "gap-1"
             )}
           >
             {name}
           </span>
-          <span className={clsx("text-sm", "font-normal", "small-caps")}>
+          <span className={clsx("text-xs", "font-normal", "small-caps")}>
             {title}
           </span>
         </Link>
@@ -112,7 +115,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
             className={clsx(
               "font-normal",
               "text-sm",
-              "letter-spacing",
+              "tracking-wider",
               "small-caps",
               {
                 [`underline`]: showUnderline({
