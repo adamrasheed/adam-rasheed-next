@@ -29,7 +29,7 @@ export default async function IndexPage() {
 
   return (
     <>
-      <Header title={title} />
+      <Header title={title} socialMedia={socialMedia} />
       <main className={clsx("flex-1")}>
         <div
           className={clsx(

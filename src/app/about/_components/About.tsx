@@ -31,7 +31,6 @@ const About: FC<AboutProps> = ({
         >
           <Image
             src={imageProps.src}
-            // loader={imageProps.loader}
             layout="fill"
             alt={mainImage?.alt || ""}
             style={{

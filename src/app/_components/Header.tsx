@@ -1,28 +1,47 @@
 "use client";
 
 import clsx from "clsx";
-import { PATHS, ROUTES } from "../_utils";
+import { ROUTES } from "../_utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_INFO_QUERYResult } from "../../../sanity.types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { useRef, useState } from "react";
+import { showUnderline } from "./utils";
+import MobileNav from "./MobileNav";
 
 const name = "Adam Rasheed";
 
-type HeaderProps = Pick<NonNullable<SITE_INFO_QUERYResult>, "title">;
-const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
+type HeaderProps = Pick<
+  NonNullable<SITE_INFO_QUERYResult>,
+  "title" | "socialMedia"
+>;
+const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
   const currentPathFull = usePathname();
+  const [isMenuShowing, setIsMenuShowing] = useState(false);
+
+  const headerRef = useRef<HTMLHeadingElement>(null);
+
+  const headerHeight = headerRef.current?.clientHeight || 0;
 
   const currentPaths = currentPathFull.split("/");
   const isBlog = currentPaths.includes("blog");
   const isCaseStudy = currentPaths.includes("case-studies");
   const currentPath = currentPaths.pop();
 
+  const handleMenuToggle = () => {
+    setIsMenuShowing((prev: boolean) => !prev);
+  };
+
   return (
     <header
+      ref={headerRef}
       className={clsx(
-        "my-8",
+        "relative",
         "container",
         "px-4",
+        "py-8",
         "grid",
         "gap-4",
         "items-center",
@@ -62,6 +81,22 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
         </Link>
       </h1>
 
+      <button
+        className="w-fit justify-self-end md:hidden"
+        onClick={handleMenuToggle}
+      >
+        <FontAwesomeIcon icon={faBars} />
+      </button>
+
+      <MobileNav
+        isShowing={isMenuShowing}
+        currentPath={currentPath}
+        isBlog={isBlog}
+        isCaseStudy={isCaseStudy}
+        socialMedia={socialMedia}
+        headerHeight={headerHeight}
+      />
+
       <nav
         className={clsx(
           "hidden",
@@ -81,10 +116,12 @@ const Header = ({ title = "Frontend Engineer" }: HeaderProps) => {
               "letter-spacing",
               "small-caps",
               {
-                [`underline`]:
-                  currentPath === route.href.split("/").pop() ||
-                  (route.href === PATHS.BLOG && isBlog) ||
-                  (route.href === PATHS.CASE_STUDIES && isCaseStudy),
+                [`underline`]: showUnderline({
+                  currentPath,
+                  href: route.href,
+                  isBlog,
+                  isCaseStudy,
+                }),
               }
             )}
           >

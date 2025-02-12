@@ -21,7 +21,7 @@ export default async function PageWrapper({
 
   return (
     <>
-      <Header title={title} />
+      <Header title={title} socialMedia={socialMedia} />
       <main className="flex-1 container lg:px-0">{children}</main>
       <Footer resume={resume} socialMedia={socialMedia} />
     </>
