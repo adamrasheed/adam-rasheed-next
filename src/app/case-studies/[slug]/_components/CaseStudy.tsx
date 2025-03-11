@@ -33,7 +33,12 @@ const CaseStudy: FC<CaseStudyProps> = ({ title, mainImage, description }) => {
       {imageProps && (
         <div
           style={{ aspectRatio: `${imageProps.width} / ${imageProps.height}` }}
-          className={clsx("relative", "block", "overflow-hidden")}
+          className={clsx(
+            "relative",
+            "block",
+            "overflow-hidden",
+            mainImage?.border && "border"
+          )}
         >
           <Image
             src={imageProps.src}

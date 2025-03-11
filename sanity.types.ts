@@ -125,8 +125,10 @@ export type CaseStudy = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    border?: boolean;
     _type: "image";
   };
+  link?: string;
   description?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -451,6 +453,7 @@ export type CASE_STUDIES_QUERYResult = Array<{
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    border?: boolean;
     _type: "image";
   } | null;
   description: Array<{
@@ -503,6 +506,7 @@ export type CASE_STUDIES_PREVIEW_QUERYResult = Array<{
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    border?: boolean;
     _type: "image";
     metadata: null;
   } | null;
@@ -525,6 +529,7 @@ export type CASE_STUDY_BY_SLUG_QUERYResult = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    border?: boolean;
     _type: "image";
     metadata: null;
   } | null;
@@ -758,6 +763,7 @@ export type HOME_QUERYResult = {
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
       alt?: string;
+      border?: boolean;
       _type: "image";
       metadata: null;
     } | null;

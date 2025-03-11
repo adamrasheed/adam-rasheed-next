@@ -46,7 +46,20 @@ export default defineType({
           type: "string",
           title: "Alternative text",
         },
+        {
+          name: "border",
+          type: "boolean",
+          title: "Add a border",
+          description: "Add a border to the image",
+        },
       ],
+    },
+    {
+      name: "link",
+      type: "url",
+      title: "Link",
+      description: "Link to the project",
+      validation: (Rule) => Rule.optional(),
     },
     {
       name: "description",

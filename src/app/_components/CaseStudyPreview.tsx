@@ -15,6 +15,7 @@ import { PATHS } from "../_utils";
 type CaseStudyPreviewProps =
   | HOME_QUERYResult["caseStudies"][0]
   | CASE_STUDIES_PREVIEW_QUERYResult[0];
+
 const CaseStudyPreview: FC<CaseStudyPreviewProps> = ({
   title,
   mainImage,
@@ -33,7 +34,12 @@ const CaseStudyPreview: FC<CaseStudyPreviewProps> = ({
         <Link
           href={link}
           style={{ aspectRatio: `${imageProps.width} / ${imageProps.height}` }}
-          className={clsx("relative", "block", "overflow-hidden")}
+          className={clsx(
+            "relative",
+            "block",
+            "overflow-hidden",
+            mainImage?.border && "border"
+          )}
         >
           <Image
             src={imageProps.src}
