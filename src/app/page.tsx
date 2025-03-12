@@ -59,10 +59,6 @@ export default async function IndexPage() {
                 components={{
                   types: {
                     image: ({ value }) => <SanityImage img={value} />,
-                    link: ({ value, renderNode, isInline }) => {
-                      console.log(value, renderNode, isInline);
-                      return <p>HELLO</p>;
-                    },
                   },
 
                   block: {
