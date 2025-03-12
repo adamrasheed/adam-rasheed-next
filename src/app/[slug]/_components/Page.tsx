@@ -1,16 +1,18 @@
 import clsx from "clsx";
-import { PortableText } from "next-sanity";
 import { PAGE_QUERYResult } from "../../../../sanity.types";
 import { FC } from "react";
+import RichText from "@/app/_components/RichText";
 
 type PageProps = NonNullable<PAGE_QUERYResult>;
 
 const Page: FC<PageProps> = ({ title, body }) => {
+  if (!body) return null;
+
   return (
-    <div className="prose dark:prose-invert">
+    <>
       <h1 className={clsx("page-title")}>{title}</h1>
-      {body && <PortableText value={body} />}
-    </div>
+      <RichText className="pb-8" content={body} />
+    </>
   );
 };
 
