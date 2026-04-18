@@ -33,23 +33,27 @@ export interface ShopifyProduct {
   };
 }
 
+const CERAMICS_COLLECTION_HANDLE = "ceramics";
+
 const PRODUCTS_QUERY = `
-  query getProducts($first: Int!) {
-    products(first: $first) {
-      edges {
-        node {
-          id
-          title
-          handle
-          description
-          priceRange {
-            minVariantPrice { amount currencyCode }
-          }
-          images(first: 1) {
-            edges { node { url altText } }
-          }
-          variants(first: 1) {
-            edges { node { id } }
+  query getCollectionProducts($handle: String!, $first: Int!) {
+    collection(handle: $handle) {
+      products(first: $first) {
+        edges {
+          node {
+            id
+            title
+            handle
+            description
+            priceRange {
+              minVariantPrice { amount currencyCode }
+            }
+            images(first: 1) {
+              edges { node { url altText } }
+            }
+            variants(first: 1) {
+              edges { node { id } }
+            }
           }
         }
       }
@@ -61,14 +65,18 @@ export async function getProducts(first = 24): Promise<ShopifyProduct[]> {
   const res = await fetch(endpoint, {
     method: "POST",
     headers: storefrontRequestHeaders(),
-    body: JSON.stringify({ query: PRODUCTS_QUERY, variables: { first } }),
+    body: JSON.stringify({
+      query: PRODUCTS_QUERY,
+      variables: { handle: CERAMICS_COLLECTION_HANDLE, first },
+    }),
     next: { revalidate: 3600 },
   });
 
   if (!res.ok) throw new Error(`Shopify fetch failed: ${res.status}`);
   const json = await res.json();
   if (json.errors?.length) throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
-  return json.data.products.edges.map((e: { node: ShopifyProduct }) => e.node);
+  const edges = json.data?.collection?.products?.edges ?? [];
+  return edges.map((e: { node: ShopifyProduct }) => e.node);
 }
 
 // ── Cart ──────────────────────────────────────────────────────────────────────

@@ -33,6 +33,8 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
   const isCaseStudy = currentPaths.includes("case-studies");
   const currentPath = currentPaths.pop();
 
+  const showCart = currentPath === "ceramics";
+
   const itemCount =
     cart?.lines.edges.reduce((sum, e) => sum + e.node.quantity, 0) ?? 0;
 
@@ -51,7 +53,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
         "gap-4",
         "items-center",
         "grid-cols-[auto_auto]",
-        "lg:px-0"
+        "lg:px-0",
       )}
     >
       <h1>
@@ -62,7 +64,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
             "items-center",
             "md:flex",
             "md:gap-1",
-            "hover:no-underline"
+            "hover:no-underline",
           )}
         >
           <span
@@ -78,7 +80,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
               "md:after:bg-current",
               "md:after:mr-1",
               "md:after:ml-[8px]",
-              "gap-1"
+              "gap-1",
             )}
           >
             {name}
@@ -92,19 +94,21 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
       {/* Mobile: cart icon + hamburger */}
       <div className="flex items-center gap-3 justify-self-end md:hidden">
         <div className="relative">
-          <button
-            onClick={openCart}
-            className="relative flex items-center gap-1"
-            aria-label="Open cart"
-          >
-            <FontAwesomeIcon icon={faCartShopping} className="text-base" />
-            {itemCount > 0 && (
-              <span className="text-xs font-semibold tabular-nums leading-none">
-                {itemCount}
-              </span>
-            )}
-          </button>
-          {isOpen && <CartDropdown />}
+          {showCart && (
+            <button
+              onClick={openCart}
+              className="relative flex items-center gap-1"
+              aria-label="Open cart"
+            >
+              <FontAwesomeIcon icon={faCartShopping} className="text-base" />
+              {itemCount > 0 && (
+                <span className="text-xs font-semibold tabular-nums leading-none">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          )}
+          {showCart && isOpen && <CartDropdown />}
         </div>
         <button className="w-fit" onClick={handleMenuToggle}>
           <FontAwesomeIcon icon={faBars} />
@@ -127,7 +131,7 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
           "md:flex",
           "gap-4",
           "justify-end",
-          "items-center"
+          "items-center",
         )}
       >
         {ROUTES.map((route) => (
@@ -146,28 +150,33 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
                   isBlog,
                   isCaseStudy,
                 }),
-              }
+              },
             )}
           >
             {route.label}
           </Link>
         ))}
 
-        <div className="relative">
-          <button
-            onClick={openCart}
-            className="flex items-center gap-1.5 font-normal text-sm"
-            aria-label="Open cart"
-          >
-            <FontAwesomeIcon icon={faCartShopping} className="text-base" />
-            {itemCount > 0 && (
-              <span className="text-xs font-semibold tabular-nums leading-none">
-                {itemCount}
-              </span>
-            )}
-          </button>
-          {isOpen && <CartDropdown />}
-        </div>
+        {showCart && (
+          <div className="relative">
+            <button
+              onClick={openCart}
+              className="flex items-center gap-1.5 font-normal text-base"
+              aria-label="Open cart"
+            >
+              <FontAwesomeIcon
+                icon={faCartShopping}
+                className="text-base size-3"
+              />
+              {itemCount > 0 && (
+                <span className="text-xs font-semibold tabular-nums leading-none">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+            {isOpen && <CartDropdown />}
+          </div>
+        )}
       </nav>
     </header>
   );
