@@ -1,7 +1,15 @@
+import "server-only";
 import { headers } from "next/headers";
 
-const domain = process.env.SHOPIFY_STORE_DOMAIN!;
-const token = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
+function assertEnvValue(value: string | undefined, name: string): string {
+  if (!value || value.trim() === "") {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
+const domain = assertEnvValue(process.env.SHOPIFY_STORE_DOMAIN, "SHOPIFY_STORE_DOMAIN");
+const token = assertEnvValue(process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN, "SHOPIFY_STOREFRONT_ACCESS_TOKEN");
 const endpoint = `https://${domain}/api/2024-01/graphql.json`;
 
 function storefrontRequestHeaders(): HeadersInit {
@@ -22,6 +30,7 @@ export interface ShopifyProduct {
   title: string;
   handle: string;
   description: string;
+  onlineStoreUrl: string | null;
   priceRange: {
     minVariantPrice: { amount: string; currencyCode: string };
   };
@@ -45,6 +54,7 @@ const PRODUCTS_QUERY = `
             title
             handle
             description
+            onlineStoreUrl
             priceRange {
               minVariantPrice { amount currencyCode }
             }

@@ -3,8 +3,6 @@ import Image from "next/image";
 import { ShopifyProduct } from "@/lib/shopify";
 import AddToCartButton from "./AddToCartButton";
 
-const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-
 type CeramicsListingsProps = {
   products: ShopifyProduct[];
 };
@@ -31,6 +29,7 @@ export default function CeramicsListings({ products }: CeramicsListingsProps) {
           const image = product.images.edges[0]?.node;
           const price = product.priceRange.minVariantPrice;
           const variantId = product.variants.edges[0]?.node.id;
+          const productUrl = product.onlineStoreUrl;
           const formattedPrice = parseFloat(price.amount).toLocaleString(
             "en-US",
             { style: "currency", currency: price.currencyCode }
@@ -39,8 +38,8 @@ export default function CeramicsListings({ products }: CeramicsListingsProps) {
           return (
             <div key={product.id}>
               <a
-                href={`https://${storeDomain}/products/${product.handle}`}
-                target="_blank"
+                href={productUrl ?? "#"}
+                target={productUrl ? "_blank" : undefined}
                 rel="noopener noreferrer"
                 className={clsx("group", "block", "hover:no-underline", "focus:no-underline")}
               >
