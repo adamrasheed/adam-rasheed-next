@@ -8,8 +8,14 @@ function assertEnvValue(value: string | undefined, name: string): string {
   return value;
 }
 
-const domain = assertEnvValue(process.env.SHOPIFY_STORE_DOMAIN, "SHOPIFY_STORE_DOMAIN");
-const token = assertEnvValue(process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN, "SHOPIFY_STOREFRONT_ACCESS_TOKEN");
+const domain = assertEnvValue(
+  process.env.SHOPIFY_STORE_DOMAIN,
+  "SHOPIFY_STORE_DOMAIN",
+);
+const token = assertEnvValue(
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+  "SHOPIFY_STOREFRONT_ACCESS_TOKEN",
+);
 const endpoint = `https://${domain}/api/2024-01/graphql.json`;
 
 function storefrontRequestHeaders(): HeadersInit {
@@ -84,9 +90,51 @@ export async function getProducts(first = 24): Promise<ShopifyProduct[]> {
 
   if (!res.ok) throw new Error(`Shopify fetch failed: ${res.status}`);
   const json = await res.json();
-  if (json.errors?.length) throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
+  if (json.errors?.length)
+    throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
   const edges = json.data?.collection?.products?.edges ?? [];
   return edges.map((e: { node: ShopifyProduct }) => e.node);
+}
+
+const PRODUCT_BY_HANDLE_QUERY = `
+  query getProductByHandle($handle: String!) {
+    product(handle: $handle) {
+      id
+      title
+      handle
+      description
+      onlineStoreUrl
+      priceRange {
+        minVariantPrice { amount currencyCode }
+      }
+      images(first: 10) {
+        edges { node { url altText } }
+      }
+      variants(first: 10) {
+        edges { node { id } }
+      }
+    }
+  }
+`;
+
+export async function getProductByHandle(
+  handle: string,
+): Promise<ShopifyProduct | null> {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: storefrontRequestHeaders(),
+    body: JSON.stringify({
+      query: PRODUCT_BY_HANDLE_QUERY,
+      variables: { handle },
+    }),
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) throw new Error(`Shopify fetch failed: ${res.status}`);
+  const json = await res.json();
+  if (json.errors?.length)
+    throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
+  return json.data?.product ?? null;
 }
 
 // ── Cart ──────────────────────────────────────────────────────────────────────
@@ -137,7 +185,10 @@ const CART_FIELDS = `
   }
 `;
 
-async function cartFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+async function cartFetch<T>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<T> {
   const res = await fetch(endpoint, {
     method: "POST",
     headers: storefrontRequestHeaders(),
@@ -146,62 +197,83 @@ async function cartFetch<T>(query: string, variables?: Record<string, unknown>):
   });
   if (!res.ok) throw new Error(`Shopify cart fetch failed: ${res.status}`);
   const json = await res.json();
-  if (json.errors?.length) throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
+  if (json.errors?.length)
+    throw new Error(`Shopify GraphQL error: ${json.errors[0].message}`);
   return json as T;
 }
 
 export async function getCart(cartId: string): Promise<ShopifyCart | null> {
   const json = await cartFetch<{ data: { cart: ShopifyCart | null } }>(
     `query getCart($cartId: ID!) { cart(id: $cartId) { ${CART_FIELDS} } }`,
-    { cartId }
+    { cartId },
   );
   return json.data.cart;
 }
 
-export async function createCart(variantId: string, quantity = 1): Promise<ShopifyCart> {
+export async function createCart(
+  variantId: string,
+  quantity = 1,
+): Promise<ShopifyCart> {
   const json = await cartFetch<{ data: { cartCreate: { cart: ShopifyCart } } }>(
     `mutation cartCreate($lines: [CartLineInput!]) {
       cartCreate(input: { lines: $lines }) {
         cart { ${CART_FIELDS} }
       }
     }`,
-    { lines: [{ merchandiseId: variantId, quantity }] }
+    { lines: [{ merchandiseId: variantId, quantity }] },
   );
   return json.data.cartCreate.cart;
 }
 
-export async function addCartLines(cartId: string, variantId: string, quantity = 1): Promise<ShopifyCart> {
-  const json = await cartFetch<{ data: { cartLinesAdd: { cart: ShopifyCart } } }>(
+export async function addCartLines(
+  cartId: string,
+  variantId: string,
+  quantity = 1,
+): Promise<ShopifyCart> {
+  const json = await cartFetch<{
+    data: { cartLinesAdd: { cart: ShopifyCart } };
+  }>(
     `mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
       cartLinesAdd(cartId: $cartId, lines: $lines) {
         cart { ${CART_FIELDS} }
       }
     }`,
-    { cartId, lines: [{ merchandiseId: variantId, quantity }] }
+    { cartId, lines: [{ merchandiseId: variantId, quantity }] },
   );
   return json.data.cartLinesAdd.cart;
 }
 
-export async function updateCartLine(cartId: string, lineId: string, quantity: number): Promise<ShopifyCart> {
-  const json = await cartFetch<{ data: { cartLinesUpdate: { cart: ShopifyCart } } }>(
+export async function updateCartLine(
+  cartId: string,
+  lineId: string,
+  quantity: number,
+): Promise<ShopifyCart> {
+  const json = await cartFetch<{
+    data: { cartLinesUpdate: { cart: ShopifyCart } };
+  }>(
     `mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       cartLinesUpdate(cartId: $cartId, lines: $lines) {
         cart { ${CART_FIELDS} }
       }
     }`,
-    { cartId, lines: [{ id: lineId, quantity }] }
+    { cartId, lines: [{ id: lineId, quantity }] },
   );
   return json.data.cartLinesUpdate.cart;
 }
 
-export async function removeCartLine(cartId: string, lineId: string): Promise<ShopifyCart> {
-  const json = await cartFetch<{ data: { cartLinesRemove: { cart: ShopifyCart } } }>(
+export async function removeCartLine(
+  cartId: string,
+  lineId: string,
+): Promise<ShopifyCart> {
+  const json = await cartFetch<{
+    data: { cartLinesRemove: { cart: ShopifyCart } };
+  }>(
     `mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
       cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
         cart { ${CART_FIELDS} }
       }
     }`,
-    { cartId, lineIds: [lineId] }
+    { cartId, lineIds: [lineId] },
   );
   return json.data.cartLinesRemove.cart;
 }

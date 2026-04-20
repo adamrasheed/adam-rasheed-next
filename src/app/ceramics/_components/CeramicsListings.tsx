@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { ShopifyProduct } from "@/lib/shopify";
 import AddToCartButton from "./AddToCartButton";
+import Link from "next/link";
 
 type CeramicsListingsProps = {
   products: ShopifyProduct[];
@@ -22,7 +23,7 @@ export default function CeramicsListings({ products }: CeramicsListingsProps) {
           "md:grid-cols-3",
           "gap-8",
           "mb-16",
-          "lg:mb-24"
+          "lg:mb-24",
         )}
       >
         {products.map((product) => {
@@ -30,21 +31,25 @@ export default function CeramicsListings({ products }: CeramicsListingsProps) {
           const price = product.priceRange.minVariantPrice;
           const variantId = product.variants.edges[0]?.node.id;
           const productUrl = product.onlineStoreUrl;
+          const handle = product.handle;
           const formattedPrice = parseFloat(price.amount).toLocaleString(
             "en-US",
-            { style: "currency", currency: price.currencyCode }
+            { style: "currency", currency: price.currencyCode },
           );
 
           return (
             <div key={product.id}>
-              <a
-                href={productUrl ?? "#"}
-                target={productUrl ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className={clsx("group", "block", "hover:no-underline", "focus:no-underline")}
+              <Link
+                href={`/ceramics/${handle}`}
+                className={clsx(
+                  "group",
+                  "block",
+                  "hover:no-underline",
+                  "focus:no-underline",
+                )}
               >
                 {image && (
-                  <div className="relative aspect-square w-full overflow-hidden mb-3 bg-[var(--bgSecondary)]">
+                  <div className="relative aspect-[4/5] w-full overflow-hidden mb-3 bg-[var(--bgSecondary)]">
                     <Image
                       src={image.url}
                       alt={image.altText ?? product.title}
@@ -58,7 +63,7 @@ export default function CeramicsListings({ products }: CeramicsListingsProps) {
                 <p className="text-sm small-caps tracking-wider opacity-60">
                   {formattedPrice}
                 </p>
-              </a>
+              </Link>
               {variantId && <AddToCartButton variantId={variantId} />}
             </div>
           );

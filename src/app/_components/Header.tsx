@@ -33,7 +33,9 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
   const isCaseStudy = currentPaths.includes("case-studies");
   const currentPath = currentPaths.pop();
 
-  const showCart = currentPath === "ceramics";
+  console.log({ currentPathFull });
+
+  const showCart = currentPathFull.includes("ceramics");
 
   const itemCount =
     cart?.lines.edges.reduce((sum, e) => sum + e.node.quantity, 0) ?? 0;
