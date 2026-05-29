@@ -21,16 +21,26 @@ export default function SignUpForm() {
 
   async function onSubmit(data: FormValues) {
     setServerError(null);
-    const res = await fetch("/api/mailchimp/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (res.ok) {
-      setSubmitted(true);
-    } else {
-      const body = await res.json();
-      setServerError(body.error ?? "Something went wrong. Please try again.");
+    try {
+      const res = await fetch("/api/mailchimp/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        let message = "Something went wrong. Please try again.";
+        try {
+          const body = await res.json();
+          if (typeof body?.error === "string") message = body.error;
+        } catch {
+          // non-JSON response — use fallback
+        }
+        setServerError(message);
+      }
+    } catch {
+      setServerError("Network error. Please check your connection and try again.");
     }
   }
 
@@ -54,11 +64,12 @@ export default function SignUpForm() {
           type="text"
           autoComplete="given-name"
           aria-invalid={!!errors.firstName}
+          aria-describedby={errors.firstName ? "firstName-error" : undefined}
           className="border border-slate-400 focus:border-slate-400"
           {...register("firstName", { required: "First name is required." })}
         />
         {errors.firstName && (
-          <p className="text-xs text-red-500 mt-1">
+          <p id="firstName-error" role="alert" className="text-xs text-red-500 mt-1">
             {errors.firstName.message}
           </p>
         )}
@@ -71,6 +82,7 @@ export default function SignUpForm() {
           type="email"
           autoComplete="email"
           aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
           className="border border-slate-400 focus:border-slate-400"
           {...register("email", {
             required: "Email is required.",
@@ -81,11 +93,13 @@ export default function SignUpForm() {
           })}
         />
         {errors.email && (
-          <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+          <p id="email-error" role="alert" className="text-xs text-red-500 mt-1">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
-      {serverError && <p className="text-xs text-red-500">{serverError}</p>}
+      {serverError && <p role="alert" className="text-xs text-red-500">{serverError}</p>}
 
       <button
         type="submit"
