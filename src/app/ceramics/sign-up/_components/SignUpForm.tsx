@@ -1,0 +1,113 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+export default function SignUpForm() {
+  const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>();
+
+  async function onSubmit(data: FormValues) {
+    setServerError(null);
+    const res = await fetch("/api/mailchimp/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      setSubmitted(true);
+    } else {
+      const body = await res.json();
+      setServerError(body.error ?? "Something went wrong. Please try again.");
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-xl font-medium mb-2">You&apos;re on the list!</p>
+        <p className="text-sm opacity-60">
+          I&apos;ll reach out when new pieces are available.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="firstName">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            autoComplete="given-name"
+            aria-invalid={!!errors.firstName}
+            {...register("firstName", { required: "First name is required." })}
+          />
+          {errors.firstName && (
+            <p className="text-xs text-red-500 mt-1">{errors.firstName.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            autoComplete="family-name"
+            {...register("lastName")}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          autoComplete="email"
+          aria-invalid={!!errors.email}
+          {...register("email", {
+            required: "Email is required.",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Please enter a valid email address.",
+            },
+          })}
+        />
+        {errors.email && (
+          <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+        )}
+      </div>
+
+      {serverError && (
+        <p className="text-xs text-red-500">{serverError}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="btn primary mt-2 w-full text-center justify-center disabled:opacity-50"
+      >
+        {isSubmitting ? "Subscribing…" : "Notify me"}
+      </button>
+
+      <p className="text-xs opacity-40 text-center">
+        No spam. Unsubscribe any time.
+      </p>
+    </form>
+  );
+}
