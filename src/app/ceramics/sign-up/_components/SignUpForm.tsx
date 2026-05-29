@@ -46,31 +46,22 @@ export default function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="firstName">First Name</label>
-          <input
-            id="firstName"
-            type="text"
-            autoComplete="given-name"
-            aria-invalid={!!errors.firstName}
-            {...register("firstName", { required: "First name is required." })}
-          />
-          {errors.firstName && (
-            <p className="text-xs text-red-500 mt-1">{errors.firstName.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            id="lastName"
-            type="text"
-            autoComplete="family-name"
-            {...register("lastName")}
-          />
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-4">
+      <div>
+        <label htmlFor="firstName">First Name</label>
+        <input
+          id="firstName"
+          type="text"
+          autoComplete="given-name"
+          aria-invalid={!!errors.firstName}
+          className="border border-slate-400 focus:border-slate-400"
+          {...register("firstName", { required: "First name is required." })}
+        />
+        {errors.firstName && (
+          <p className="text-xs text-red-500 mt-1">
+            {errors.firstName.message}
+          </p>
+        )}
       </div>
 
       <div>
@@ -80,6 +71,7 @@ export default function SignUpForm() {
           type="email"
           autoComplete="email"
           aria-invalid={!!errors.email}
+          className="border border-slate-400 focus:border-slate-400"
           {...register("email", {
             required: "Email is required.",
             pattern: {
@@ -93,16 +85,14 @@ export default function SignUpForm() {
         )}
       </div>
 
-      {serverError && (
-        <p className="text-xs text-red-500">{serverError}</p>
-      )}
+      {serverError && <p className="text-xs text-red-500">{serverError}</p>}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="btn primary mt-2 w-full text-center justify-center disabled:opacity-50"
+        className="btn primary mt-2 px-6 py-3 w-full text-center justify-center disabled:opacity-50"
       >
-        {isSubmitting ? "Subscribing…" : "Notify me"}
+        {isSubmitting ? "Subscribing…" : "Sign up"}
       </button>
 
       <p className="text-xs opacity-40 text-center">
