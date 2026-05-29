@@ -2,12 +2,13 @@ import crypto from "crypto";
 
 export const runtime = "nodejs";
 
-const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
-const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
-const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER?.trim();
 const TAG = "Adam Rasheed Ceramics";
 
 export async function POST(request: Request) {
+  const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
+  const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
+  const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER?.trim();
+
   if (!MAILCHIMP_API_KEY || !MAILCHIMP_LIST_ID || !MAILCHIMP_SERVER) {
     return Response.json({ error: "Mailchimp is not configured." }, { status: 500 });
   }
@@ -23,9 +24,8 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { firstName, lastName, email } = body as Record<string, unknown>;
+  const { firstName, email } = body as Record<string, unknown>;
   const firstNameStr = typeof firstName === "string" ? firstName.trim() : "";
-  const lastNameStr = typeof lastName === "string" ? lastName.trim() : "";
   const emailStr = typeof email === "string" ? email.trim() : "";
 
   if (!firstNameStr || !emailStr) {
@@ -53,10 +53,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         email_address: emailStr,
         status_if_new: "subscribed",
-        merge_fields: {
-          FNAME: firstNameStr,
-          LNAME: lastNameStr,
-        },
+        merge_fields: { FNAME: firstNameStr },
       }),
     });
   } catch {
