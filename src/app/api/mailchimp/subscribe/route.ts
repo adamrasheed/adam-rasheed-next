@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
 const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
-const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER;
+const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER?.trim();
 const TAG = "Adam Rasheed Ceramics";
 
 export async function POST(request: Request) {
@@ -41,22 +41,27 @@ export async function POST(request: Request) {
   const authHeader = `Basic ${Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString("base64")}`;
 
   // Upsert the member (PUT creates or updates)
-  const memberRes = await fetch(`${baseUrl}/members/${subscriberHash}`, {
-    method: "PUT",
-    cache: "no-store",
-    headers: {
-      Authorization: authHeader,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email_address: emailStr,
-      status_if_new: "subscribed",
-      merge_fields: {
-        FNAME: firstNameStr,
-        LNAME: lastNameStr,
+  let memberRes: Response;
+  try {
+    memberRes = await fetch(`${baseUrl}/members/${subscriberHash}`, {
+      method: "PUT",
+      cache: "no-store",
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        email_address: emailStr,
+        status_if_new: "subscribed",
+        merge_fields: {
+          FNAME: firstNameStr,
+          LNAME: lastNameStr,
+        },
+      }),
+    });
+  } catch {
+    return Response.json({ error: "Failed to reach Mailchimp." }, { status: 502 });
+  }
 
   if (!memberRes.ok) {
     let detail = "Failed to subscribe.";
@@ -66,22 +71,26 @@ export async function POST(request: Request) {
     } catch {
       // non-JSON body — use fallback message
     }
-    return Response.json({ error: detail }, { status: memberRes.status });
+    const status = memberRes.status >= 400 && memberRes.status < 500 ? 400 : 500;
+    return Response.json({ error: detail }, { status });
   }
 
-  // Apply the tag
-  const tagRes = await fetch(`${baseUrl}/members/${subscriberHash}/tags`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      Authorization: authHeader,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ tags: [{ name: TAG, status: "active" }] }),
-  });
-
-  if (!tagRes.ok) {
-    return Response.json({ error: "Subscribed, but failed to apply tag." }, { status: 500 });
+  // Apply the tag — subscription already succeeded; tag failure is non-fatal
+  try {
+    const tagRes = await fetch(`${baseUrl}/members/${subscriberHash}/tags`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tags: [{ name: TAG, status: "active" }] }),
+    });
+    if (!tagRes.ok) {
+      console.error(`Mailchimp tag failed for ${subscriberHash}: ${tagRes.status}`);
+    }
+  } catch (err) {
+    console.error("Mailchimp tag request threw:", err);
   }
 
   return Response.json({ ok: true });
