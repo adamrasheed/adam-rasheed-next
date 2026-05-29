@@ -5,7 +5,6 @@ import { useState } from "react";
 
 type FormValues = {
   firstName: string;
-  lastName: string;
   email: string;
 };
 

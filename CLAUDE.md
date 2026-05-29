@@ -25,9 +25,9 @@ Project-level guidance for Claude Code.
 
 ## Mailchimp integration
 
-- The server prefix is embedded at the end of the API key (`xxxxxxxx-us14`). Extract with `.split("-").pop()` — no separate `MAILCHIMP_SERVER_PREFIX` env var needed.
 - Required env vars (add to `.env.local` and Vercel project settings):
   - `MAILCHIMP_API_KEY`
   - `MAILCHIMP_LIST_ID`
+  - `MAILCHIMP_SERVER` (e.g. `us14` — the server prefix for your account)
 - Use `PUT /lists/{id}/members/{hash}` for upsert so returning visitors don't error.
 - Apply tags via a separate `POST /lists/{id}/members/{hash}/tags` call after the upsert.

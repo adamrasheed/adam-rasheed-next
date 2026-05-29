@@ -15,7 +15,7 @@ export default function CeramicsSignUpPage() {
             Adam Rasheed Ceramics
           </p>
           <h1 className="text-3xl font-semibold mb-4 leading-tight">
-            Stay update about latest drops
+            Stay updated about the latest drops
           </h1>
           <p className="text-sm opacity-60 leading-relaxed">
             Sign up and I&apos;ll let you know when new handmade pieces are
