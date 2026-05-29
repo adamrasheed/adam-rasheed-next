@@ -4,10 +4,11 @@ export const runtime = "nodejs";
 
 const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
 const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
+const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER;
 const TAG = "Adam Rasheed Ceramics";
 
 export async function POST(request: Request) {
-  if (!MAILCHIMP_API_KEY || !MAILCHIMP_LIST_ID) {
+  if (!MAILCHIMP_API_KEY || !MAILCHIMP_LIST_ID || !MAILCHIMP_SERVER) {
     return Response.json({ error: "Mailchimp is not configured." }, { status: 500 });
   }
 
@@ -31,14 +32,12 @@ export async function POST(request: Request) {
     return Response.json({ error: "Email and first name are required." }, { status: 400 });
   }
 
-  // The server prefix is embedded at the end of the API key, e.g. "xxxxxxxx-us14"
-  const serverPrefix = MAILCHIMP_API_KEY.split("-").pop();
   const subscriberHash = crypto
     .createHash("md5")
     .update(emailStr.toLowerCase())
     .digest("hex");
 
-  const baseUrl = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}`;
+  const baseUrl = `https://${MAILCHIMP_SERVER}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}`;
   const authHeader = `Basic ${Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString("base64")}`;
 
   // Upsert the member (PUT creates or updates)
