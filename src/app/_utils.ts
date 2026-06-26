@@ -9,7 +9,7 @@ export const PATHS = {
   ABOUT: "/about",
   BLOG: "/blog",
   CASE_STUDIES: "/case-studies",
-  CERAMICS: "/ceramics",
+  CERAMICS: "https://adamrasheed.studio/",
   FREELANCE: "/freelance",
 };
 
@@ -29,6 +29,7 @@ export const ROUTES = [
   {
     label: PATH_NAMES.CERAMICS,
     href: PATHS.CERAMICS,
+    external: true,
   },
 ];
 
