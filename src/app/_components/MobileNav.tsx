@@ -113,12 +113,14 @@ const MobileNav: FC<MobileNavProps> = ({
             "small-caps",
             itemClassName,
             {
-              [`underline`]: showUnderline({
-                currentPath,
-                href: route.href,
-                isBlog,
-                isCaseStudy,
-              }),
+              [`underline`]:
+                !route.external &&
+                showUnderline({
+                  currentPath,
+                  href: route.href,
+                  isBlog,
+                  isCaseStudy,
+                }),
             }
           );
 

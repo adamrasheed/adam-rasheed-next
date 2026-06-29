@@ -116,12 +116,14 @@ const Header = ({ title = "Frontend Engineer", socialMedia }: HeaderProps) => {
             "tracking-wider",
             "small-caps",
             {
-              [`underline`]: showUnderline({
-                currentPath,
-                href: route.href,
-                isBlog,
-                isCaseStudy,
-              }),
+              [`underline`]:
+                !route.external &&
+                showUnderline({
+                  currentPath,
+                  href: route.href,
+                  isBlog,
+                  isCaseStudy,
+                }),
             },
           );
 
