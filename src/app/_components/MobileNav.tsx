@@ -106,28 +106,40 @@ const MobileNav: FC<MobileNavProps> = ({
           "items-center"
         )}
       >
-        {ROUTES.map((route) => (
-          <Link
-            href={route.href}
-            key={route.href}
-            className={clsx(
-              "font-normal",
-              "text-sm",
-              "small-caps",
-              itemClassName,
-              {
-                [`underline`]: showUnderline({
+        {ROUTES.map((route) => {
+          const className = clsx(
+            "font-normal",
+            "text-sm",
+            "small-caps",
+            itemClassName,
+            {
+              [`underline`]:
+                !route.external &&
+                showUnderline({
                   currentPath,
                   href: route.href,
                   isBlog,
                   isCaseStudy,
                 }),
-              }
-            )}
-          >
-            {route.label}
-          </Link>
-        ))}
+            }
+          );
+
+          return route.external ? (
+            <a
+              href={route.href}
+              key={route.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={className}
+            >
+              {route.label}
+            </a>
+          ) : (
+            <Link href={route.href} key={route.href} className={className}>
+              {route.label}
+            </Link>
+          );
+        })}
       </nav>
       <SocialMediaIcons className="mt-auto gap-8" socialMedia={socialMedia} />
     </div>
