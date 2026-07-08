@@ -236,10 +236,38 @@ const SuccessView = ({ email, onReset }: { email: string; onReset: () => void })
       phone call happened, and nobody handled a card number.
     </p>
     <div className={clsx("flex", "justify-center", "gap-4", "flex-wrap")}>
-      <button onClick={onReset} className="btn">
+      <button
+        onClick={onReset}
+        className={clsx(
+          "rounded-md",
+          "border",
+          "border-slate-300",
+          "bg-white",
+          "text-slate-700",
+          "px-5",
+          "py-2.5",
+          "text-sm",
+          "font-semibold"
+        )}
+      >
         Run the demo again
       </button>
-      <Link href="/patient-payments" className="btn primary">
+      <Link
+        href="/patient-payments"
+        className={clsx(
+          "rounded-md",
+          "bg-indigo-900",
+          "px-5",
+          "py-2.5",
+          "text-sm",
+          "font-semibold",
+          "text-white",
+          "hover:text-white",
+          "focus:text-white",
+          "hover:no-underline",
+          "focus:no-underline"
+        )}
+      >
         Back to the service page
       </Link>
     </div>
