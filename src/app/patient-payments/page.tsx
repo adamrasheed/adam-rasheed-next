@@ -46,17 +46,17 @@ const FAQS = [
   {
     question: "Whose account does the money go into?",
     answer:
-      "Yours. Everything is set up in your own Stripe account, connected to your own bank. I never hold, route, or touch your funds. I couldn’t if I wanted to.",
+      "Yours. Everything is set up in your own Stripe account, connected to your own bank. I never hold, route, or touch your funds.",
   },
   {
     question: "What does the patient actually see?",
     answer:
-      "Try it yourself: the demo below is exactly what your patient gets, start to finish, on their own phone.",
+      "Try it yourself: the demo is exactly what your patient gets, start to finish, on their own phone. The page shows an invoice number and an amount, nothing else. No diagnosis, no service details, no clinical information, so nothing in the payment flow exposes protected health information.",
   },
   {
-    question: "Is patient information kept out of it?",
+    question: "What about HIPAA and patient privacy?",
     answer:
-      "Yes, by design. The payment page shows an invoice number and an amount. No diagnosis, no service details, no clinical information anywhere in the payment flow.",
+      "The payment flow is designed to keep protected health information out entirely: no clinical details ever appear on the page, in receipts, or in notifications. Neither your clinic's website nor I ever store patient names, card numbers, or any personal information. Card details are entered once, directly on Stripe's PCI-certified payment infrastructure, and your staff never see or handle them. Nothing about the install adds a new place where patient data lives.",
   },
   {
     question: "What happens if something breaks after you’re done?",
@@ -236,7 +236,7 @@ export default function PatientPaymentsPage() {
       {/* Who I am */}
       <section className="max-w-3xl">
         <h2 className={clsx("font-black", "text-3xl", "mb-6")}>
-          Who’s behind this
+          Who you’ll work with
         </h2>
         <div className={clsx("grid", "gap-4", "max-w-[65ch]")}>
           <p>
@@ -256,7 +256,7 @@ export default function PatientPaymentsPage() {
       {/* Final CTA */}
       <section className="max-w-3xl">
         <h2 className={clsx("font-black", "text-3xl", "text-balance", "mb-4")}>
-          Try the demo, then let’s talk.
+          Get in touch
         </h2>
         <p className={clsx("max-w-[60ch]", "mb-8")}>
           Email me at <a href={CONTACT_HREF}>{CONTACT_EMAIL}</a>. Tell me
