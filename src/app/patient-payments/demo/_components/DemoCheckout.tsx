@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -67,7 +67,7 @@ const validate = (fields: Fields): Partial<Record<keyof Fields, string>> => {
     errors.expiry = "Enter an expiration date as MM/YY.";
   }
   if (!/^\d{3,4}$/.test(fields.cvc)) {
-    errors.cvc = "Enter the 3 or 4 digit code.";
+    errors.cvc = "Enter the 3- or 4-digit code.";
   }
   if (!/^\d{5}$/.test(fields.zip.trim())) {
     errors.zip = "Enter a 5-digit ZIP code.";
@@ -252,6 +252,13 @@ export default function DemoCheckout() {
     {}
   );
   const [status, setStatus] = useState<"idle" | "processing" | "paid">("idle");
+  const paymentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (paymentTimer.current) clearTimeout(paymentTimer.current);
+    };
+  }, []);
 
   const setField = (id: keyof Fields, value: string) => {
     const formatted =
@@ -267,8 +274,9 @@ export default function DemoCheckout() {
   };
 
   const simulatePayment = () => {
+    if (paymentTimer.current) clearTimeout(paymentTimer.current);
     setStatus("processing");
-    setTimeout(() => setStatus("paid"), 1400);
+    paymentTimer.current = setTimeout(() => setStatus("paid"), 1400);
   };
 
   const handleCardSubmit = (e: React.FormEvent) => {
@@ -281,7 +289,7 @@ export default function DemoCheckout() {
 
   const handleWalletPay = () => {
     if (!fields.email.trim() || !fields.email.includes("@")) {
-      setFields((prev) => ({ ...prev, email: "patient@example.com" }));
+      setField("email", "patient@example.com");
     }
     simulatePayment();
   };
