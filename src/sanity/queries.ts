@@ -20,7 +20,7 @@ export const CASE_STUDY_PREVIEW_FIELDS = `{
   }
 }`;
 
-export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"]{
+export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"] | order(_createdAt desc){
   _id,
   title,
   subtitle,
@@ -31,7 +31,7 @@ export const CASE_STUDIES_QUERY = defineQuery(`*[_type == "caseStudy"]{
 `);
 
 export const CASE_STUDIES_PREVIEW_QUERY = defineQuery(
-  `*[_type == "caseStudy"]${CASE_STUDY_PREVIEW_FIELDS}`
+  `*[_type == "caseStudy"] | order(_createdAt desc)${CASE_STUDY_PREVIEW_FIELDS}`
 );
 
 export const CASE_STUDY_BY_SLUG_QUERY =
@@ -143,8 +143,8 @@ export const SITE_INFO_QUERY = defineQuery(SITE_INFO_QUERY_FIELDS);
 
 export const HOME_QUERY = defineQuery(`{
   "siteInfo": ${SITE_INFO_QUERY_FIELDS},
-  "caseStudies": *[_type == "caseStudy"]${CASE_STUDY_PREVIEW_FIELDS}[0...2],
-  "posts": *[_type == "post"]${POST_PREVIEW_FIELDS}[0...2],
+  "caseStudies": *[_type == "caseStudy"] | order(_createdAt desc)${CASE_STUDY_PREVIEW_FIELDS}[0...2],
+  "posts": *[_type == "post"] | order(publishedAt desc)${POST_PREVIEW_FIELDS}[0...2],
 }`);
 
 export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{
