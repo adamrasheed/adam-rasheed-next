@@ -14,6 +14,11 @@ export const richTextComponents = (
   marks: {
     link: ({ value, children }) => {
       const href = value?.href || "";
+
+      // href is optional in the blockContent schema, and an empty one renders
+      // an anchor pointing back at the current page. Drop the anchor instead.
+      if (!href) return <>{children}</>;
+
       const isExternal = href.startsWith("http") || href.startsWith("mailto:");
 
       if (isExternal) {
