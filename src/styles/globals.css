@@ -4,6 +4,10 @@
 @tailwind variants;
 
 :root {
+  /* Keeps native UI (notably the sticky sidebar's scrollbar) in step with the
+     theme instead of rendering a light scrollbar on a dark page. */
+  color-scheme: light;
+
   --background: #ffffff;
   --foreground: #171717;
 
@@ -21,6 +25,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
+
     --background: #0f172a;
     --foreground: #cbd5e1;
   }
@@ -34,6 +40,18 @@ body {
 
 .prose-images .prose-image {
   max-width: 100%;
+}
+
+/* Table of contents anchors: without this the heading lands flush against the
+   top edge of the viewport with no breathing room above it. */
+.prose :is(h2, h3) {
+  scroll-margin-top: 2rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer utilities {

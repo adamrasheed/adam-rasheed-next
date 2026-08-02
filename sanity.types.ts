@@ -94,6 +94,19 @@ export type SiteInfo = {
     _key: string;
   }>;
   email?: string;
+  authorImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  authorBio?: string;
   resume?: string;
   socialMedia?: {
     x?: string;
@@ -437,7 +450,7 @@ export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
-// Query: *[_type == "caseStudy"]{  _id,  title,  subtitle,  teaser,  mainImage,  description[]{  ...,  _type == "image" => {    "imageUrl": asset->url,    alt  }},}
+// Query: *[_type == "caseStudy"] | order(_createdAt desc){  _id,  title,  subtitle,  teaser,  mainImage,  description[]{  ...,  _type == "image" => {    "imageUrl": asset->url,    alt  }},}
 export type CASE_STUDIES_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -489,7 +502,7 @@ export type CASE_STUDIES_QUERYResult = Array<{
   }> | null;
 }>;
 // Variable: CASE_STUDIES_PREVIEW_QUERY
-// Query: *[_type == "caseStudy"]{  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}
+// Query: *[_type == "caseStudy"] | order(_createdAt desc){  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}
 export type CASE_STUDIES_PREVIEW_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -566,7 +579,7 @@ export type CASE_STUDY_BY_SLUG_QUERYResult = {
   }> | null;
 } | null;
 // Variable: POSTS_PREVIEWS_QUERY
-// Query: *[_type == "post"]{  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}
+// Query: *[_type == "post"] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}
 export type POSTS_PREVIEWS_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -580,7 +593,7 @@ export type POSTS_PREVIEWS_QUERYResult = Array<{
   publishedAt: string | null;
 }>;
 // Variable: SINGLE_POST_QUERY
-// Query: {    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage {        asset->{          url,          metadata        },        alt      },      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == "post" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },        "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    }  }
+// Query: {    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage {        asset->{          url,          metadata        },        alt      },      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },        "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },    "author": *[_type == "siteInfo"][0]{      title,      email,      authorBio,      authorImage,      socialMedia    }  }
 export type SINGLE_POST_QUERYResult = {
   post: {
     _id: string;
@@ -631,7 +644,13 @@ export type SINGLE_POST_QUERYResult = {
       imageUrl: string | null;
     }> | null;
   } | null;
-  relatedPostsByCategory: Array<never>;
+  relatedPostsByCategory: Array<{
+    _id: string;
+    title: string | null;
+    slug: Slug | null;
+    excerpt: string | null;
+    publishedAt: string | null;
+  }>;
   fallbackPosts: Array<{
     _id: string;
     title: string | null;
@@ -639,6 +658,31 @@ export type SINGLE_POST_QUERYResult = {
     excerpt: string | null;
     publishedAt: string | null;
   }>;
+  author: {
+    title: string | null;
+    email: string | null;
+    authorBio: string | null;
+    authorImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    socialMedia: {
+      x?: string;
+      instagram?: string;
+      linkedIn?: string;
+      github?: string;
+      youtube?: string;
+      dribbble?: string;
+    } | null;
+  } | null;
 };
 // Variable: PAGE_QUERY
 // Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    slug,    body[]{      ...,      _type == "image" => {        "imageUrl": asset->url,        alt      }    }  }
@@ -713,7 +757,7 @@ export type SITE_INFO_QUERYResult = {
   } | null;
 } | null;
 // Variable: HOME_QUERY
-// Query: {  "siteInfo": *[_type == "siteInfo"][0]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia},  "caseStudies": *[_type == "caseStudy"]{  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}[0...2],  "posts": *[_type == "post"]{  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}[0...2],}
+// Query: {  "siteInfo": *[_type == "siteInfo"][0]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia},  "caseStudies": *[_type == "caseStudy"] | order(_createdAt desc){  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}[0...2],  "posts": *[_type == "post"] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}[0...2],}
 export type HOME_QUERYResult = {
   siteInfo: {
     _id: string;
@@ -851,7 +895,7 @@ export type CATEGORIES_QUERYResult = Array<{
   slug: string | null;
 }>;
 // Variable: POSTS_PREVIEW_BY_SLUG_QUERY
-// Query: *[  _type == "post" &&   ($categorySlug == null || $categorySlug in categories[]->slug.current)]{  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    "slug": slug.current  },  publishedAt,}
+// Query: *[  _type == "post" &&   ($categorySlug == null || $categorySlug in categories[]->slug.current)] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    "slug": slug.current  },  publishedAt,}
 export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -881,16 +925,16 @@ export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  mainImage,\n  description[]{\n  ...,\n  _type == \"image\" => {\n    \"imageUrl\": asset->url,\n    alt\n  }\n},\n}\n": CASE_STUDIES_QUERYResult;
-    "*[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}": CASE_STUDIES_PREVIEW_QUERYResult;
+    "*[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  mainImage,\n  description[]{\n  ...,\n  _type == \"image\" => {\n    \"imageUrl\": asset->url,\n    alt\n  }\n},\n}\n": CASE_STUDIES_QUERYResult;
+    "*[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}": CASE_STUDIES_PREVIEW_QUERYResult;
     "*[_type == \"caseStudy\" && slug.current == $slug][0]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  },\n  description[]{\n  ...,\n  _type == \"image\" => {\n    \"imageUrl\": asset->url,\n    alt\n  }\n},\n}": CASE_STUDY_BY_SLUG_QUERYResult;
-    "*[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}": POSTS_PREVIEWS_QUERYResult;
-    "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == \"post\" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    }\n  }\n": SINGLE_POST_QUERYResult;
+    "*[_type == \"post\"] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}": POSTS_PREVIEWS_QUERYResult;
+    "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && references(*[_type == \"post\" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n\n    \"author\": *[_type == \"siteInfo\"][0]{\n      title,\n      email,\n      authorBio,\n      authorImage,\n      socialMedia\n    }\n  }\n": SINGLE_POST_QUERYResult;
     "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
     "*[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
-    "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n},\n  \"caseStudies\": *[_type == \"caseStudy\"]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}[0...2],\n  \"posts\": *[_type == \"post\"]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}[0...2],\n}": HOME_QUERYResult;
+    "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n},\n  \"caseStudies\": *[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}[0...2],\n  \"posts\": *[_type == \"post\"] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}[0...2],\n}": HOME_QUERYResult;
     "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
-    "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n]{\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
+    "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
   }
 }
