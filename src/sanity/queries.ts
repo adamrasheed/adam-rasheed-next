@@ -62,7 +62,7 @@ const POST_PREVIEW_FIELDS = `{
 }`;
 
 export const POSTS_PREVIEWS_QUERY = defineQuery(
-  `*[_type == "post"]${POST_PREVIEW_FIELDS}`
+  `*[_type == "post"] | order(publishedAt desc)${POST_PREVIEW_FIELDS}`
 );
 
 export const SINGLE_POST_QUERY = defineQuery(`
@@ -185,7 +185,7 @@ export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"]{
 export const POSTS_PREVIEW_BY_SLUG_QUERY = defineQuery(`*[
   _type == "post" && 
   ($categorySlug == null || $categorySlug in categories[]->slug.current)
-]{
+] | order(publishedAt desc){
   _id,
   title,
   slug,

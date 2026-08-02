@@ -4,6 +4,7 @@ import { PortableText } from "next-sanity";
 import { getFormattedDate } from "@/app/_utils";
 import PostSidebar from "./PostSidebar";
 import BreadCrumbs, { BreadCrumbType } from "@/app/_components/Breadcrumbs";
+import { richTextComponents } from "@/app/_components/RichText";
 
 const Post = ({
   singlePost,
@@ -41,12 +42,17 @@ const Post = ({
       <BreadCrumbs breadcrumbs={breadCrumbs} />
       <div className={clsx("post-container")}>
         <div className="grid gap-8">
-          <article className="prose dark:prose-invert md:mb-16">
+          <article className="prose dark:prose-invert prose-images md:mb-16">
             <h1>{title}</h1>
             {publishedAt && (
               <p className="small-caps">{getFormattedDate(publishedAt)}</p>
             )}
-            {body && <PortableText value={body} />}
+            {body && (
+              <PortableText
+                value={body}
+                components={richTextComponents("prose-image")}
+              />
+            )}
           </article>
         </div>
         <PostSidebar posts={relatedPosts} />
