@@ -48,6 +48,11 @@ export default async function OpengraphImage({
 }: {
   params: { slug: string };
 }) {
+  // These TTFs are subset to Latin-1 plus common punctuation (~32KB each,
+  // down from ~320KB). The full faces pushed this edge function to 1.1MB,
+  // over the 1MB plan limit, which fails at deploy time rather than at build.
+  // A title using a glyph outside that range will render blank, so widen the
+  // subset in scripts/ rather than swapping in the full font.
   const [regular, bold] = await Promise.all([
     fetch(new URL("../../_fonts/Inter-Regular.ttf", import.meta.url)).then(
       (res) => res.arrayBuffer(),
