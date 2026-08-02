@@ -20,15 +20,19 @@ const AuthorCard = ({ author }: { author: AuthorType }) => {
 
   const name = SITE_NAME;
 
-  // fit("crop") honors the hotspot set in the studio, so a portrait crops to a
-  // square around the face rather than the middle of the frame.
-  const avatarUrl = authorImage?.asset
+  const avatarBuilder = authorImage?.asset
     ? urlFor(authorImage)
         .width(AVATAR_SOURCE_PX)
         .height(AVATAR_SOURCE_PX)
         .fit("crop")
         .auto("format")
-        .url()
+    : null;
+
+  // With a hotspot set in the studio the builder crops around it. Without one
+  // the default is a centre crop, which takes the middle band of a portrait and
+  // cuts the top of the head off — so bias to the top instead.
+  const avatarUrl = avatarBuilder
+    ? (authorImage?.hotspot ? avatarBuilder : avatarBuilder.crop("top")).url()
     : null;
 
   // Deliberately a <div>: globals.css has a global `section { py-10 ... }` rule
