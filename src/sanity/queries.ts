@@ -93,7 +93,7 @@ export const SINGLE_POST_QUERY = defineQuery(`
       }
     },
     
-    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && defined(categories) && categories[]->_id in *[_type == "post" && slug.current == $slug][0].categories[]->_id] | order(publishedAt desc)[0...3]{
+    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{
       _id,
       title,
       slug,
@@ -107,6 +107,14 @@ export const SINGLE_POST_QUERY = defineQuery(`
       slug,
       excerpt,
       publishedAt
+    },
+
+    "author": *[_type == "siteInfo"][0]{
+      title,
+      email,
+      authorBio,
+      authorImage,
+      socialMedia
     }
   }
 `);

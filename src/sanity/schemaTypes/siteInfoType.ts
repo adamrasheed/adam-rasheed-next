@@ -1,4 +1,4 @@
-import { defineType } from "sanity";
+import { defineField, defineType } from "sanity";
 
 export const siteInfo = defineType({
   name: "siteInfo",
@@ -25,6 +25,32 @@ export const siteInfo = defineType({
       type: "email",
       description: "Contact email address",
     },
+    {
+      name: "authorImage",
+      title: "Author Image",
+      type: "image",
+      options: {
+        hotspot: true,
+      },
+      description:
+        "Headshot for the blog author card. Cropped to a square on the site, so set the hotspot on your face.",
+      fields: [
+        {
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+        },
+      ],
+    },
+    defineField({
+      name: "authorBio",
+      title: "Author Bio",
+      type: "text",
+      rows: 3,
+      description:
+        "One or two sentences shown under blog posts. Keep it short; the sidebar is narrow.",
+      validation: (Rule) => Rule.max(220).warning("Longer than the card fits"),
+    }),
     {
       name: "resume",
       title: "Resume Link",

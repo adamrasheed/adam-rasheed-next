@@ -5,8 +5,13 @@ import { TypedObject } from "sanity";
 import Link from "next/link";
 import type { PortableTextComponents } from "@portabletext/react";
 
+/**
+ * `headingIds` maps a block `_key` to the anchor id the table of contents links
+ * to. Callers that have no TOC can omit it and headings render unchanged.
+ */
 export const richTextComponents = (
-  imgClassName?: string
+  imgClassName?: string,
+  headingIds?: Record<string, string>
 ): PortableTextComponents => ({
   types: {
     image: ({ value }) => <SanityImage img={value} className={imgClassName} />,
@@ -35,6 +40,14 @@ export const richTextComponents = (
   block: {
     h1: ({ children }) => (
       <h1 className={clsx("font-black", "text-4xl")}>{children}</h1>
+    ),
+    // No className on purpose: prose already styles these, and the only reason
+    // to override them is to stamp the anchor id.
+    h2: ({ children, value }) => (
+      <h2 id={headingIds?.[value?._key ?? ""]}>{children}</h2>
+    ),
+    h3: ({ children, value }) => (
+      <h3 id={headingIds?.[value?._key ?? ""]}>{children}</h3>
     ),
   },
 });
