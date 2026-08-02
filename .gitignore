@@ -36,3 +36,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+# Claude Code local config and worktrees
+.claude/
