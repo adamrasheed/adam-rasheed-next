@@ -87,7 +87,9 @@ function inlineSpans(text, markDefs) {
     const candidates = [
       link && { kind: "link", at: link.index, m: link },
       bold && { kind: "bold", at: bold.index, m: bold },
-      em && { kind: "em", at: em.index + em.m?.[1]?.length ?? 0, m: em },
+      // The em pattern captures the preceding character so `**` isn't matched
+      // as italic, so the token starts after that lead group, not at em.index.
+      em && { kind: "em", at: em.index + (em[1]?.length ?? 0), m: em },
     ].filter(Boolean);
 
     if (!candidates.length) {
@@ -204,6 +206,12 @@ async function preflight(projectId, token, envPath) {
       `token rejected (401 "Session not found"). Create an Editor-scoped token at ` +
         `sanity.io/manage → API → Tokens and set SANITY_API_WRITE_TOKEN in ${envPath}.`,
     );
+  }
+  // Without this, a 403/404/5xx falls through to the role check below and gets
+  // reported as "token is read-only", which sends you looking in the wrong place.
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    die(`Sanity returned ${res.status} validating the token. ${body.slice(0, 200)}`);
   }
   const me = await res.json().catch(() => ({}));
   const roles = (me.roles || []).map((r) => r.name);

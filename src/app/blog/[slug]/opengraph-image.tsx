@@ -53,13 +53,23 @@ export default async function OpengraphImage({
   // over the 1MB plan limit, which fails at deploy time rather than at build.
   // A title using a glyph outside that range will render blank, so widen the
   // subset in scripts/ rather than swapping in the full font.
+  // A 404 here still resolves, and arrayBuffer() would hand Satori an HTML
+  // error page, which fails much later with an unrelated-looking message.
+  // The URLs must stay static literals: webpack traces the .ttf into the bundle
+  // by statically analyzing new URL(..., import.meta.url), and a template
+  // literal defeats that and leaves the font unresolvable at runtime.
+  const loadFont = async (url: URL, name: string) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`OG font ${name} failed to load (${res.status})`);
+    return res.arrayBuffer();
+  };
+
   const [regular, bold] = await Promise.all([
-    fetch(new URL("../../_fonts/Inter-Regular.ttf", import.meta.url)).then(
-      (res) => res.arrayBuffer(),
+    loadFont(
+      new URL("../../_fonts/Inter-Regular.ttf", import.meta.url),
+      "Inter-Regular.ttf",
     ),
-    fetch(new URL("../../_fonts/Inter-Bold.ttf", import.meta.url)).then((res) =>
-      res.arrayBuffer(),
-    ),
+    loadFont(new URL("../../_fonts/Inter-Bold.ttf", import.meta.url), "Inter-Bold.ttf"),
   ]);
 
   let title = SITE_NAME;
