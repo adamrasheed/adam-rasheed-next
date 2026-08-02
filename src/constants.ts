@@ -13,6 +13,10 @@ function absoluteUrl(value: string | undefined) {
   return /^https?:\/\//.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
+// The default must be the www host. The apex 308-redirects to it, and a scraper
+// that does not follow redirects gets text/plain back for og:image rather than a
+// PNG, which defeats the whole point of generating the card.
+//
 // Vercel sets NEXT_PUBLIC_VERCEL_URL without a protocol on preview deploys, so
 // share previews resolve against the deployment being viewed instead of prod.
 export const SITE_URL =
@@ -20,4 +24,4 @@ export const SITE_URL =
   (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
     ? absoluteUrl(process.env.NEXT_PUBLIC_VERCEL_URL)
     : undefined) ??
-  "https://adamrasheed.com";
+  "https://www.adamrasheed.com";
