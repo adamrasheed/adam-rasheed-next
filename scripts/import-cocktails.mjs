@@ -61,11 +61,11 @@ const slugify = (name) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-async function preflight(projectId, token, envPath) {
-  if (!projectId) die(`NEXT_PUBLIC_SANITY_PROJECT_ID not found in ${envPath}`);
+async function preflight(projectId, token, envLabel) {
+  if (!projectId) die(`NEXT_PUBLIC_SANITY_PROJECT_ID not found in ${envLabel}`);
   if (!token) {
     die(
-      `no write token. Add SANITY_API_WRITE_TOKEN (Editor scope, from sanity.io/manage → API → Tokens) to ${envPath}.`,
+      `no write token. Add SANITY_API_WRITE_TOKEN (Editor scope, from sanity.io/manage → API → Tokens) to ${envLabel}.`,
     );
   }
   let res;
@@ -79,7 +79,7 @@ async function preflight(projectId, token, envPath) {
   if (res.status === 401) {
     die(
       `token rejected (401). Create an Editor-scoped token at sanity.io/manage → API → Tokens ` +
-        `and set SANITY_API_WRITE_TOKEN in ${envPath}.`,
+        `and set SANITY_API_WRITE_TOKEN in ${envLabel}.`,
     );
   }
   if (!res.ok) {
@@ -148,15 +148,16 @@ async function main() {
   }
 
   const envPath = resolve(REPO, ".env");
+  const envLocalPath = resolve(REPO, ".env.local");
   loadEnv(envPath);
-  loadEnv(resolve(REPO, ".env.local"));
+  loadEnv(envLocalPath);
 
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
   const token =
     process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN || "";
 
-  await preflight(projectId, token, envPath);
+  await preflight(projectId, token, `${envPath} (or ${envLocalPath})`);
   const client = createClient({ projectId, dataset, apiVersion: "2024-09-05", token, useCdn: false });
 
   let tx = client.transaction();

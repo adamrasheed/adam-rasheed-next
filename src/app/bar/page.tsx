@@ -1,7 +1,7 @@
 import { sanityFetch } from "@/sanity/lib/client";
 import { COCKTAILS_QUERY } from "@/sanity/queries";
 import { COCKTAILS_QUERYResult } from "../../../sanity.types";
-import { COCKTAIL_CATEGORIES } from "@/sanity/schemaTypes/cocktailType";
+import { COCKTAIL_CATEGORIES } from "@/sanity/cocktailCategories";
 
 export default async function BarPage() {
   const cocktails = await sanityFetch<COCKTAILS_QUERYResult>({

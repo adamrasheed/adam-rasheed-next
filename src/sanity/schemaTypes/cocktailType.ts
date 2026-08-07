@@ -1,13 +1,5 @@
 import { defineType } from "sanity";
-
-export const COCKTAIL_CATEGORIES = [
-  { title: "Gin", value: "gin" },
-  { title: "Whiskey", value: "whiskey" },
-  { title: "Mezcal", value: "mezcal" },
-  { title: "Rum", value: "rum" },
-  { title: "Aperitivo & Low-Proof", value: "aperitivo" },
-  { title: "Zero-Proof", value: "zero-proof" },
-] as const;
+import { COCKTAIL_CATEGORIES } from "../cocktailCategories";
 
 export const cocktailType = defineType({
   name: "cocktail",
