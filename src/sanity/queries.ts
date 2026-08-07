@@ -206,3 +206,13 @@ export const POSTS_PREVIEW_BY_SLUG_QUERY = defineQuery(`*[
   },
   publishedAt,
 }`);
+
+export const COCKTAILS_QUERY = defineQuery(`*[
+  _type == "cocktail" && available == true
+] | order(name asc){
+  _id,
+  name,
+  description,
+  ingredients,
+  category,
+}`);
