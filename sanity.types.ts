@@ -118,6 +118,19 @@ export type SiteInfo = {
   };
 };
 
+export type Cocktail = {
+  _id: string;
+  _type: "cocktail";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  description?: string;
+  ingredients?: Array<string>;
+  category?: "gin" | "whiskey" | "mezcal" | "rum" | "aperitivo" | "zero-proof";
+  available?: boolean;
+};
+
 export type CaseStudy = {
   _id: string;
   _type: "caseStudy";
@@ -446,7 +459,7 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Cocktail | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
@@ -920,6 +933,15 @@ export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
   }> | null;
   publishedAt: string | null;
 }>;
+// Variable: COCKTAILS_QUERY
+// Query: *[  _type == "cocktail" && available == true] | order(name asc){  _id,  name,  description,  ingredients,  category,}
+export type COCKTAILS_QUERYResult = Array<{
+  _id: string;
+  name: string | null;
+  description: string | null;
+  ingredients: Array<string> | null;
+  category: "aperitivo" | "gin" | "mezcal" | "rum" | "whiskey" | "zero-proof" | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -936,5 +958,6 @@ declare module "@sanity/client" {
     "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
     "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
+    "*[\n  _type == \"cocktail\" && available == true\n] | order(name asc){\n  _id,\n  name,\n  description,\n  ingredients,\n  category,\n}": COCKTAILS_QUERYResult;
   }
 }

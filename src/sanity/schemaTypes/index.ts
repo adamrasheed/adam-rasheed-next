@@ -8,6 +8,7 @@ import { siteInfo } from "./siteInfoType";
 import { pageType } from "./pageType";
 import { aboutType } from "./aboutType";
 import { contributionType } from "./aboutContributionType";
+import { cocktailType } from "./cocktailType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -18,6 +19,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     postType,
     pageType,
     caseStudyType,
+    cocktailType,
     siteInfo,
   ],
 };
