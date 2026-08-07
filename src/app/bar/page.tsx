@@ -17,11 +17,11 @@ export default async function BarPage() {
     <div className="page-container sml">
       <h1 className="page-title">The Bar</h1>
 
-      <div className="grid gap-12">
+      <div className="grid gap-y-0 [&>section]:p-y-2">
         {sections.map((section) => (
           <section key={section.value}>
             <h2 className="section-title small-caps text-lg">
-              {section.title}
+              {section.title} —
             </h2>
             <ul className="grid gap-6">
               {section.cocktails.map((cocktail) => (
