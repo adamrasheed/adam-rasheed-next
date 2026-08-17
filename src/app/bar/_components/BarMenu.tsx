@@ -191,9 +191,25 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
               aria-describedby={errorId}
               autoComplete="given-name"
             />
-            <button type="submit" className="btn primary">
-              Save and order
-            </button>
+            <div className="flex gap-2">
+              <button type="submit" className="btn primary">
+                {pendingCocktailId ? "Save and order" : "Save"}
+              </button>
+              {/* Without this, tapping Order and changing your mind traps you
+                  in the form with no way back to the menu. */}
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setAskingName(false);
+                  setPendingCocktailId(null);
+                  setNameDraft("");
+                  setError(null);
+                }}
+              >
+                Never mind
+              </button>
+            </div>
           </form>
         )}
 
@@ -228,10 +244,10 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
         )}
       </div>
 
-      {/* Section spacing and the trailing dash come from df26904 on main. Kept
-          verbatim so moving the menu into this component does not quietly undo
-          that styling pass. */}
-      <div className="grid gap-y-0 [&>section]:p-y-2">
+      {/* Section spacing and the trailing dash come from df26904 on main. That
+          commit wrote `p-y-2`, which Tailwind does not generate, so the padding
+          silently fell back to the `section` base rule in globals.css. */}
+      <div className="grid gap-y-0 [&>section]:py-2">
         {sections.map((section) => (
           <section key={section.value}>
             <h2 className="section-title small-caps text-lg">
