@@ -216,3 +216,42 @@ export const COCKTAILS_QUERY = defineQuery(`*[
   ingredients,
   category,
 }`);
+
+// The whole live state of the bar in one round trip: the open/closed switch plus
+// every order in flight, oldest first. Deliberately omits guestId, because this
+// response is shared by every guest, and guestId is what authorizes a cancel.
+export const BAR_STATE_QUERY = defineQuery(`{
+  "open": coalesce(*[_type == "barSession"][0].open, false),
+  "orders": *[_type == "order"] | order(placedAt asc){
+    _id,
+    guestName,
+    status,
+    placedAt,
+    "cocktailId": cocktail._ref,
+    "cocktailName": cocktail->name
+  }
+}`);
+
+export const BAR_OPEN_QUERY = defineQuery(
+  `coalesce(*[_type == "barSession"][0].open, false)`
+);
+
+// Serves both the "you already have a drink coming" pre-check (looked up by the
+// guest's derived document id) and the ownership check on cancel.
+export const ORDER_BY_ID_QUERY = defineQuery(`*[
+  _type == "order" && _id == $orderId
+][0]{
+  _id,
+  guestId,
+  status,
+  "cocktailName": cocktail->name
+}`);
+
+export const ORDERABLE_COCKTAIL_QUERY = defineQuery(`*[
+  _type == "cocktail" && _id == $cocktailId && available == true
+][0]{
+  _id,
+  name
+}`);
+
+export const ORDER_COUNT_QUERY = defineQuery(`count(*[_type == "order"])`);

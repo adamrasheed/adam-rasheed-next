@@ -118,6 +118,34 @@ export type SiteInfo = {
   };
 };
 
+export type Order = {
+  _id: string;
+  _type: "order";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  cocktail?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "cocktail";
+  };
+  guestName?: string;
+  guestId?: string;
+  status?: "queued" | "making";
+  placedAt?: string;
+};
+
+export type BarSession = {
+  _id: string;
+  _type: "barSession";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  open?: boolean;
+  openedAt?: string;
+};
+
 export type Cocktail = {
   _id: string;
   _type: "cocktail";
@@ -459,7 +487,7 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Cocktail | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Order | BarSession | Cocktail | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
@@ -942,6 +970,39 @@ export type COCKTAILS_QUERYResult = Array<{
   ingredients: Array<string> | null;
   category: "aperitivo" | "gin" | "mezcal" | "rum" | "whiskey" | "zero-proof" | null;
 }>;
+// Variable: BAR_STATE_QUERY
+// Query: {  "open": coalesce(*[_type == "barSession"][0].open, false),  "orders": *[_type == "order"] | order(placedAt asc){    _id,    guestName,    status,    placedAt,    "cocktailId": cocktail._ref,    "cocktailName": cocktail->name  }}
+export type BAR_STATE_QUERYResult = {
+  open: boolean | false;
+  orders: Array<{
+    _id: string;
+    guestName: string | null;
+    status: "making" | "queued" | null;
+    placedAt: string | null;
+    cocktailId: string | null;
+    cocktailName: string | null;
+  }>;
+};
+// Variable: BAR_OPEN_QUERY
+// Query: coalesce(*[_type == "barSession"][0].open, false)
+export type BAR_OPEN_QUERYResult = boolean | false;
+// Variable: ORDER_BY_ID_QUERY
+// Query: *[  _type == "order" && _id == $orderId][0]{  _id,  guestId,  status,  "cocktailName": cocktail->name}
+export type ORDER_BY_ID_QUERYResult = {
+  _id: string;
+  guestId: string | null;
+  status: "making" | "queued" | null;
+  cocktailName: string | null;
+} | null;
+// Variable: ORDERABLE_COCKTAIL_QUERY
+// Query: *[  _type == "cocktail" && _id == $cocktailId && available == true][0]{  _id,  name}
+export type ORDERABLE_COCKTAIL_QUERYResult = {
+  _id: string;
+  name: string | null;
+} | null;
+// Variable: ORDER_COUNT_QUERY
+// Query: count(*[_type == "order"])
+export type ORDER_COUNT_QUERYResult = number;
 
 // Query TypeMap
 import "@sanity/client";
@@ -959,5 +1020,10 @@ declare module "@sanity/client" {
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
     "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
     "*[\n  _type == \"cocktail\" && available == true\n] | order(name asc){\n  _id,\n  name,\n  description,\n  ingredients,\n  category,\n}": COCKTAILS_QUERYResult;
+    "{\n  \"open\": coalesce(*[_type == \"barSession\"][0].open, false),\n  \"orders\": *[_type == \"order\"] | order(placedAt asc){\n    _id,\n    guestName,\n    status,\n    placedAt,\n    \"cocktailId\": cocktail._ref,\n    \"cocktailName\": cocktail->name\n  }\n}": BAR_STATE_QUERYResult;
+    "coalesce(*[_type == \"barSession\"][0].open, false)": BAR_OPEN_QUERYResult;
+    "*[\n  _type == \"order\" && _id == $orderId\n][0]{\n  _id,\n  guestId,\n  status,\n  \"cocktailName\": cocktail->name\n}": ORDER_BY_ID_QUERYResult;
+    "*[\n  _type == \"cocktail\" && _id == $cocktailId && available == true\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;
+    "count(*[_type == \"order\"])": ORDER_COUNT_QUERYResult;
   }
 }
