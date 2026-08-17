@@ -17,6 +17,14 @@ export const structure: StructureResolver = (S) =>
         .title("Site Info")
         .child(S.document().schemaType("siteInfo").documentId("siteInfo")),
       S.divider(),
+      S.documentTypeListItem("cocktail").title("Cocktails"),
+      S.listItem()
+        .title("Bar Session")
+        .child(
+          S.document().schemaType("barSession").documentId("barSession")
+        ),
+      S.documentTypeListItem("order").title("Orders"),
+      S.divider(),
       ...S.documentTypeListItems().filter(
         (item) =>
           item.getId() &&
@@ -27,6 +35,9 @@ export const structure: StructureResolver = (S) =>
             "caseStudy",
             "siteInfo",
             "about",
+            "cocktail",
+            "barSession",
+            "order",
           ].includes(item.getId()!)
       ),
       S.divider(),
