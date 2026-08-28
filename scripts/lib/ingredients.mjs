@@ -9,19 +9,9 @@
 
 import { readFileSync } from "node:fs";
 
-// Mirrors src/sanity/ingredientCategories.ts. Duplicated because .mjs cannot
-// import a .ts module; keep the two in sync by hand.
-export const INGREDIENT_CATEGORIES = [
-  "spirit",
-  "liqueur",
-  "vermouth-wine",
-  "bitters",
-  "mixer",
-  "sweetener",
-  "fresh",
-];
-
-// bar-inventory.md heading -> category value.
+// bar-inventory.md heading -> category value. The values mirror
+// src/sanity/ingredientCategories.ts, which .mjs cannot import; keep the two in
+// sync by hand. guessCategory below returns from the same set.
 const HEADING_CATEGORIES = {
   spirits: "spirit",
   "liqueurs and amari": "liqueur",
