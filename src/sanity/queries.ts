@@ -207,13 +207,33 @@ export const POSTS_PREVIEW_BY_SLUG_QUERY = defineQuery(`*[
   publishedAt,
 }`);
 
+// Availability is derived from the shelf: a drink is on the menu only when
+// every ingredient it needs is in stock. `available` stays as an explicit 86
+// override on top of that, and off always wins, so it is still how a drink gets
+// pulled when the bottles are all there.
+//
+// This is computed in GROQ rather than in the page for two reasons. The order
+// route has to enforce the same rule server-side before it writes an order, so
+// the rule needs one definition both callers share or they drift. And the page
+// has no use for per-bottle stock: filtering here means an unavailable drink
+// never reaches the client, which is what "hidden entirely, not greyed out"
+// requires.
+//
+// `optional != true` is what keeps a missing garnish from 86ing a whole drink.
+// The `count(ingredients) > 0` guard hides a cocktail with an empty ingredient
+// list: the schema should have rejected that document, and offering a drink
+// nothing is known about is the wrong way to fail.
+const COCKTAIL_IN_STOCK = `available != false
+  && count(ingredients) > 0
+  && count(ingredients[optional != true && ingredient->inStock != true]) == 0`;
+
 export const COCKTAILS_QUERY = defineQuery(`*[
-  _type == "cocktail" && available == true
+  _type == "cocktail" && ${COCKTAIL_IN_STOCK}
 ] | order(name asc){
   _id,
   name,
   description,
-  ingredients,
+  "ingredients": ingredients[]{"name": coalesce(label, ingredient->name)}.name,
   category,
 }`);
 
@@ -247,8 +267,10 @@ export const ORDER_BY_ID_QUERY = defineQuery(`*[
   "cocktailName": cocktail->name
 }`);
 
+// Same availability rule as the menu, re-checked at order time: a bottle can
+// run out between the page render and the tap.
 export const ORDERABLE_COCKTAIL_QUERY = defineQuery(`*[
-  _type == "cocktail" && _id == $cocktailId && available == true
+  _type == "cocktail" && _id == $cocktailId && ${COCKTAIL_IN_STOCK}
 ][0]{
   _id,
   name

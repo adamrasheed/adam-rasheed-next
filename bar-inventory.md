@@ -1,8 +1,24 @@
 # Bar inventory
 
-Source of truth for what's on Adam's shelf. The bar-menu skill reads and updates
-this file, then cross-references it against the cocktails in Sanity to suggest
-drinks to add or 86. Updated: 2026-08-07.
+Stock lives in Sanity now, as `ingredient` documents with an `inStock` boolean.
+The `/bar` menu is derived from them: a cocktail shows only when every
+ingredient it needs is in stock. This file is no longer the source of truth for
+what is on the shelf.
+
+Read and change stock with:
+
+```
+node scripts/set-stock.mjs --list
+node scripts/set-stock.mjs --out "Campari" --in "Rye whiskey"   # plan
+node scripts/set-stock.mjs --out "Campari" --in "Rye whiskey" --write
+```
+
+The plan says which drinks the change puts on the menu and which it takes off.
+Sanity Studio, under Ingredients, does the same job one checkbox at a time.
+
+The list below is the seed those documents were created from, by
+`scripts/migrate-ingredients.mjs`. It records the shelf as of 2026-08-07 and is
+not kept current. Adding a bottle here does nothing on its own.
 
 ## Spirits
 
@@ -51,6 +67,8 @@ drinks to add or 86. Updated: 2026-08-07.
 - Assorted spices
 
 ## Notably missing (gates some classics)
+
+Kept by hand. This is a shopping list, not inventory, so the migration skips it.
 
 - Orange liqueur (triple sec / Cointreau / curacao): no Margaritas, Sidecars
 - Sparkling wine confirmed? If one of the wine bottles is prosecco, spritzes unlock
