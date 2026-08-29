@@ -9,6 +9,7 @@ import { pageType } from "./pageType";
 import { aboutType } from "./aboutType";
 import { contributionType } from "./aboutContributionType";
 import { cocktailType } from "./cocktailType";
+import { ingredientType } from "./ingredientType";
 import { barSessionType } from "./barSessionType";
 import { orderType } from "./orderType";
 
@@ -22,6 +23,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     pageType,
     caseStudyType,
     cocktailType,
+    ingredientType,
     barSessionType,
     orderType,
     siteInfo,

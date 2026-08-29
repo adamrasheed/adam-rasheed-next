@@ -18,6 +18,7 @@ export const structure: StructureResolver = (S) =>
         .child(S.document().schemaType("siteInfo").documentId("siteInfo")),
       S.divider(),
       S.documentTypeListItem("cocktail").title("Cocktails"),
+      S.documentTypeListItem("ingredient").title("Ingredients"),
       S.listItem()
         .title("Bar Session")
         .child(
@@ -36,6 +37,7 @@ export const structure: StructureResolver = (S) =>
             "siteInfo",
             "about",
             "cocktail",
+            "ingredient",
             "barSession",
             "order",
           ].includes(item.getId()!)

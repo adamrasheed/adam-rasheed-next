@@ -154,9 +154,31 @@ export type Cocktail = {
   _rev: string;
   name?: string;
   description?: string;
-  ingredients?: Array<string>;
+  ingredients?: Array<{
+    ingredient?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "ingredient";
+    };
+    label?: string;
+    optional?: boolean;
+    _type: "cocktailIngredient";
+    _key: string;
+  }>;
   category?: "gin" | "whiskey" | "mezcal" | "rum" | "aperitivo" | "zero-proof";
   available?: boolean;
+};
+
+export type Ingredient = {
+  _id: string;
+  _type: "ingredient";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  inStock?: boolean;
+  category?: "spirit" | "liqueur" | "vermouth-wine" | "bitters" | "mixer" | "sweetener" | "fresh";
 };
 
 export type CaseStudy = {
@@ -487,7 +509,7 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Order | BarSession | Cocktail | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Order | BarSession | Cocktail | Ingredient | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
@@ -962,12 +984,12 @@ export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
   publishedAt: string | null;
 }>;
 // Variable: COCKTAILS_QUERY
-// Query: *[  _type == "cocktail" && available == true] | order(name asc){  _id,  name,  description,  ingredients,  category,}
+// Query: *[  _type == "cocktail" && available != false  && count(ingredients) > 0  && count(ingredients[optional != true && ingredient->inStock != true]) == 0] | order(name asc){  _id,  name,  description,  "ingredients": ingredients[]{"name": coalesce(label, ingredient->name)}.name,  category,}
 export type COCKTAILS_QUERYResult = Array<{
   _id: string;
   name: string | null;
   description: string | null;
-  ingredients: Array<string> | null;
+  ingredients: Array<string | null> | null;
   category: "aperitivo" | "gin" | "mezcal" | "rum" | "whiskey" | "zero-proof" | null;
 }>;
 // Variable: BAR_STATE_QUERY
@@ -995,7 +1017,7 @@ export type ORDER_BY_ID_QUERYResult = {
   cocktailName: string | null;
 } | null;
 // Variable: ORDERABLE_COCKTAIL_QUERY
-// Query: *[  _type == "cocktail" && _id == $cocktailId && available == true][0]{  _id,  name}
+// Query: *[  _type == "cocktail" && _id == $cocktailId && available != false  && count(ingredients) > 0  && count(ingredients[optional != true && ingredient->inStock != true]) == 0][0]{  _id,  name}
 export type ORDERABLE_COCKTAIL_QUERYResult = {
   _id: string;
   name: string | null;
@@ -1019,11 +1041,11 @@ declare module "@sanity/client" {
     "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
     "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
-    "*[\n  _type == \"cocktail\" && available == true\n] | order(name asc){\n  _id,\n  name,\n  description,\n  ingredients,\n  category,\n}": COCKTAILS_QUERYResult;
+    "*[\n  _type == \"cocktail\" && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n] | order(name asc){\n  _id,\n  name,\n  description,\n  \"ingredients\": ingredients[]{\"name\": coalesce(label, ingredient->name)}.name,\n  category,\n}": COCKTAILS_QUERYResult;
     "{\n  \"open\": coalesce(*[_type == \"barSession\"][0].open, false),\n  \"orders\": *[_type == \"order\"] | order(placedAt asc){\n    _id,\n    guestName,\n    status,\n    placedAt,\n    \"cocktailId\": cocktail._ref,\n    \"cocktailName\": cocktail->name\n  }\n}": BAR_STATE_QUERYResult;
     "coalesce(*[_type == \"barSession\"][0].open, false)": BAR_OPEN_QUERYResult;
     "*[\n  _type == \"order\" && _id == $orderId\n][0]{\n  _id,\n  guestId,\n  status,\n  \"cocktailName\": cocktail->name\n}": ORDER_BY_ID_QUERYResult;
-    "*[\n  _type == \"cocktail\" && _id == $cocktailId && available == true\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;
+    "*[\n  _type == \"cocktail\" && _id == $cocktailId && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;
     "count(*[_type == \"order\"])": ORDER_COUNT_QUERYResult;
   }
 }

@@ -1,175 +1,194 @@
 #!/usr/bin/env node
-// import-cocktails.mjs — publish cocktail documents to Sanity from a JSON file.
+// import-cocktails.mjs: publish cocktail documents to Sanity from a JSON file.
 //
 // Unlike import-post.mjs, this PUBLISHES directly (no draft step): the bar-menu
 // workflow's sign-off happens in chat before this script ever runs, and menu
 // tweaks need to be live before guests arrive. Re-running with the same names
 // overwrites in place, so it also handles edits and availability flips.
 //
+// Ingredients are still written as plain strings here, because that is how a
+// menu gets written. The script resolves each string to the `ingredient`
+// document that tracks its stock, which is what decides whether the drink shows
+// on /bar at all. A string it cannot resolve stops the import rather than
+// quietly publishing a drink that references nothing.
+//
 // Usage:
 //   node scripts/import-cocktails.mjs --file menu.json
 // Options:
-//   --dry-run   print the documents that would be written, write nothing
+//   --dry-run          print the documents that would be written, write nothing
+//   --create-missing   create ingredients the shelf has never heard of, marked
+//                      out of stock (so the drink stays off the menu until the
+//                      bottle is checked in with set-stock.mjs)
 //
 // JSON shape: an array of
 //   {
 //     "name": "Negroni",
 //     "description": "One line, menu-style",
-//     "ingredients": ["gin", "Campari", "sweet vermouth"],
+//     "ingredients": ["Amass gin", "Campari", "sweet vermouth", "orange"],
 //     "category": "gin" | "whiskey" | "mezcal" | "rum" | "aperitivo" | "zero-proof",
-//     "available": true            // optional, defaults to true
+//     "available": true            // optional, defaults to true. An explicit 86.
 //   }
 
-import { createClient } from "@sanity/client";
 import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
-const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import {
+  arg,
+  die,
+  has,
+  loadEnv,
+  preflight,
+  readClient,
+  writeClient,
+} from "./lib/sanity.mjs";
+import {
+  buildIndex,
+  ingredientRow,
+  resolveIngredient,
+  slugify,
+} from "./lib/ingredients.mjs";
+
+const SCRIPT = "import-cocktails";
+const stop = (msg) => die(SCRIPT, msg);
 
 const CATEGORIES = ["gin", "whiskey", "mezcal", "rum", "aperitivo", "zero-proof"];
 
-function arg(name, fallback) {
-  const i = process.argv.indexOf(`--${name}`);
-  if (i !== -1 && process.argv[i + 1] && !process.argv[i + 1].startsWith("--")) {
-    return process.argv[i + 1];
-  }
-  return fallback;
-}
-const has = (name) => process.argv.includes(`--${name}`);
-const die = (msg) => {
-  console.error(`import-cocktails: ${msg}`);
-  process.exit(1);
-};
-
-function loadEnv(file) {
-  if (!existsSync(file)) return;
-  for (const line of readFileSync(file, "utf8").split("\n")) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-    if (!m) continue;
-    let [, k, v] = m;
-    v = v.replace(/^["']|["']$/g, "");
-    if (!process.env[k]) process.env[k] = v;
-  }
-}
-
-const slugify = (name) =>
-  name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-async function preflight(projectId, token, envLabel) {
-  if (!projectId) die(`NEXT_PUBLIC_SANITY_PROJECT_ID not found in ${envLabel}`);
-  if (!token) {
-    die(
-      `no write token. Add SANITY_API_WRITE_TOKEN (Editor scope, from sanity.io/manage → API → Tokens) to ${envLabel}.`,
-    );
-  }
-  let res;
-  try {
-    res = await fetch(`https://${projectId}.api.sanity.io/v2021-06-07/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  } catch (e) {
-    die(`could not reach Sanity to validate the token (${e.message}).`);
-  }
-  if (res.status === 401) {
-    die(
-      `token rejected (401). Create an Editor-scoped token at sanity.io/manage → API → Tokens ` +
-        `and set SANITY_API_WRITE_TOKEN in ${envLabel}.`,
-    );
-  }
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    die(`Sanity returned ${res.status} validating the token. ${body.slice(0, 200)}`);
-  }
-  const me = await res.json().catch(() => ({}));
-  const roles = (me.roles || []).map((r) => r.name);
-  if (!roles.some((r) => ["administrator", "editor", "developer", "deploy-studio"].includes(r))) {
-    die(`token is read-only (roles: ${roles.join(",") || "none"}).`);
-  }
-}
+const INGREDIENTS_QUERY = `*[_type == "ingredient"]{ _id, name, category, inStock }`;
 
 function validate(entry, i) {
   const at = `entry ${i + 1}${entry?.name ? ` ("${entry.name}")` : ""}`;
-  if (typeof entry?.name !== "string" || !entry.name.trim()) die(`${at}: missing name`);
+
+  if (typeof entry?.name !== "string" || !entry.name.trim()) stop(`${at}: missing name`);
   if (typeof entry.description !== "string" || !entry.description.trim())
-    die(`${at}: missing description`);
+    stop(`${at}: missing description`);
   if (!Array.isArray(entry.ingredients) || entry.ingredients.length === 0)
-    die(`${at}: ingredients must be a non-empty array of strings`);
+    stop(`${at}: ingredients must be a non-empty array of strings`);
   if (entry.ingredients.some((x) => typeof x !== "string" || !x.trim()))
-    die(`${at}: every ingredient must be a non-empty string`);
+    stop(`${at}: every ingredient must be a non-empty string`);
   if (!CATEGORIES.includes(entry.category))
-    die(`${at}: category "${entry.category}" is not one of ${CATEGORIES.join(", ")}`);
+    stop(`${at}: category "${entry.category}" is not one of ${CATEGORIES.join(", ")}`);
   if (entry.available !== undefined && typeof entry.available !== "boolean")
-    die(`${at}: available must be a boolean when present`);
+    stop(`${at}: available must be a boolean when present`);
 }
 
 async function main() {
   const file = arg("file");
-  if (!file) die("--file is required");
+
+  if (!file) stop("--file is required");
+
   const path = resolve(file);
-  if (!existsSync(path)) die(`no such file: ${path}`);
+
+  if (!existsSync(path)) stop(`no such file: ${path}`);
 
   let entries;
+
   try {
     entries = JSON.parse(readFileSync(path, "utf8"));
   } catch (e) {
-    die(`could not parse ${path} as JSON (${e.message})`);
+    stop(`could not parse ${path} as JSON (${e.message})`);
   }
+
   if (!Array.isArray(entries) || entries.length === 0)
-    die("the file must contain a non-empty JSON array");
+    stop("the file must contain a non-empty JSON array");
 
   entries.forEach(validate);
 
-  const docs = entries.map((entry) => ({
-    _id: `cocktail-${slugify(entry.name)}`,
-    _type: "cocktail",
-    name: entry.name.trim(),
-    description: entry.description.trim(),
-    ingredients: entry.ingredients.map((x) => x.trim()),
-    category: entry.category,
-    available: entry.available ?? true,
-  }));
+  const env = loadEnv();
+
+  if (!env.projectId) stop(`NEXT_PUBLIC_SANITY_PROJECT_ID not found in ${env.label}`);
+
+  // The shelf is read even on a dry run: resolving ingredients is most of what
+  // can go wrong with an import now, so the dry run has to check it.
+  const shelf = await readClient(env).fetch(INGREDIENTS_QUERY);
+
+  if (shelf.length === 0) {
+    stop("there are no ingredient documents yet. Run scripts/migrate-ingredients.mjs first.");
+  }
+
+  const index = buildIndex(shelf.map(({ name, category }) => ({ name, category })));
+  const onShelf = new Set(shelf.map((doc) => doc._id));
+  const missing = [];
+  const newIngredients = new Map();
+
+  const docs = entries.map((entry) => {
+    const rows = entry.ingredients.map((written, i) => {
+      const resolved = resolveIngredient(written, index);
+
+      if (!onShelf.has(resolved.id)) {
+        missing.push({ cocktail: entry.name, written, id: resolved.id });
+        newIngredients.set(resolved.id, {
+          _id: resolved.id,
+          _type: "ingredient",
+          name: resolved.name,
+          category: resolved.category,
+          // Out of stock, because nothing says it is on the shelf. The drink
+          // publishes but stays off the menu until the bottle is checked in.
+          inStock: false,
+        });
+      }
+
+      return ingredientRow(resolved, `${slugify(written) || "row"}-${i}`);
+    });
+
+    return {
+      _id: `cocktail-${slugify(entry.name)}`,
+      _type: "cocktail",
+      name: entry.name.trim(),
+      description: entry.description.trim(),
+      ingredients: rows,
+      category: entry.category,
+      available: entry.available ?? true,
+    };
+  });
 
   const ids = new Set();
+
   for (const doc of docs) {
-    if (ids.has(doc._id)) die(`duplicate cocktail name after slugify: ${doc._id}`);
+    if (ids.has(doc._id)) stop(`duplicate cocktail name after slugify: ${doc._id}`);
     ids.add(doc._id);
   }
 
+  if (missing.length && !has("create-missing")) {
+    for (const miss of missing) {
+      console.error(`  "${miss.written}" (${miss.cocktail}) -> ${miss.id}, not on the shelf`);
+    }
+
+    stop(
+      `${missing.length} ingredient(s) have no document. Check the bottle in with ` +
+        `scripts/set-stock.mjs --in "<name>", add an alias in scripts/lib/ingredients.mjs, ` +
+        `or re-run with --create-missing to create them out of stock.`,
+    );
+  }
+
   if (has("dry-run")) {
-    console.log(JSON.stringify(docs, null, 2));
-    console.error(`\nimport-cocktails: dry run. ${docs.length} cocktails. Nothing written.`);
+    console.log(JSON.stringify([...newIngredients.values(), ...docs], null, 2));
+    console.error(
+      `\n${SCRIPT}: dry run. ${docs.length} cocktails` +
+        (newIngredients.size ? `, ${newIngredients.size} new ingredients` : "") +
+        ". Nothing written.",
+    );
     return;
   }
 
-  const envPath = resolve(REPO, ".env");
-  const envLocalPath = resolve(REPO, ".env.local");
-  loadEnv(envPath);
-  loadEnv(envLocalPath);
+  await preflight(SCRIPT, env);
 
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
-  const token =
-    process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN || "";
-
-  await preflight(projectId, token, `${envPath} (or ${envLocalPath})`);
-  const client = createClient({ projectId, dataset, apiVersion: "2024-09-05", token, useCdn: false });
-
+  const client = writeClient(env);
   let tx = client.transaction();
+
+  // Ingredients first, and createIfNotExists so an import never resets stock.
+  for (const doc of newIngredients.values()) tx = tx.createIfNotExists(doc);
   for (const doc of docs) tx = tx.createOrReplace(doc);
+
   await tx.commit();
 
   const off = docs.filter((d) => !d.available).length;
+
   console.log(
-    `import-cocktails: published ${docs.length} cocktails` +
+    `${SCRIPT}: published ${docs.length} cocktails` +
       (off ? ` (${off} marked unavailable)` : "") +
+      (newIngredients.size ? `, created ${newIngredients.size} out-of-stock ingredients` : "") +
       `. Live at /bar.`,
   );
 }
 
-main().catch((e) => die(e.message));
+main().catch((e) => stop(e.message));
