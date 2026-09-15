@@ -121,11 +121,16 @@ const OPTIONAL_STRINGS = new Set(
     "luxardo cherry",
     "castelvetrano olives",
     "castelvetrano olives or lemon twist",
+    // Not because a float is a garnish, but because of what it points at: the
+    // only wine on the shelf is one "type unspecified" entry, so its stock flag
+    // cannot tell us whether there is Sauvignon Blanc in particular. Required
+    // here would 86 the Crisp Martini off a signal that never meant that.
+    "sauvignon blanc float",
   ].map(normalizeName),
 );
 
-// Deliberately no "float": a float is a component of the drink, not a garnish.
-// The Crisp Martini without its Sauvignon Blanc is a different cocktail.
+// Deliberately no "float" in the patterns: a float is a component of the drink,
+// not a garnish, so it stays required unless a specific drink is listed above.
 const OPTIONAL_PATTERNS = /\b(twist|peel|wedge|slice|garnish)\b/;
 
 /** Is this written ingredient a garnish rather than something the drink needs? */
