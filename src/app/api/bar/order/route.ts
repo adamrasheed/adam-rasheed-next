@@ -17,6 +17,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_NAME_LENGTH = 40;
+const MAX_NOTES_LENGTH = 140;
 
 // Guest ids are minted in the browser, so nothing stops a script from claiming
 // a new identity per request while the bar is open. This caps the blast radius
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
 
   const cocktailId = trimmedString(body.cocktailId);
   const guestName = trimmedString(body.guestName);
+  const notes = trimmedString(body.notes);
   const guestId = body.guestId;
 
   if (!isValidGuestId(guestId)) return fail("Malformed request.", 400);
@@ -46,6 +48,9 @@ export async function POST(request: Request) {
   if (!guestName) return fail("Add your name so I know whose drink it is.", 400);
   if (guestName.length > MAX_NAME_LENGTH) {
     return fail(`Keep the name under ${MAX_NAME_LENGTH} characters.`, 400);
+  }
+  if (notes.length > MAX_NOTES_LENGTH) {
+    return fail(`Keep the note under ${MAX_NOTES_LENGTH} characters.`, 400);
   }
 
   const orderId = orderDocumentId(guestId);
@@ -80,6 +85,9 @@ export async function POST(request: Request) {
       cocktail: { _type: "reference", _ref: cocktailId },
       guestId,
       guestName,
+      // Omitted rather than stored empty, so the field is absent in Studio
+      // for the guests who wanted the drink as written.
+      ...(notes ? { notes } : {}),
       status: "queued",
       placedAt: new Date().toISOString(),
     });

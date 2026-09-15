@@ -8,6 +8,8 @@ export type QueueOrder = {
   guestName: string;
   cocktailId: string;
   cocktailName: string;
+  /** Free-text customization from the guest, or null when they asked for it as written. */
+  notes: string | null;
   status: OrderStatus;
   placedAt: string;
 };

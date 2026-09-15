@@ -132,6 +132,7 @@ export type Order = {
   };
   guestName?: string;
   guestId?: string;
+  notes?: string;
   status?: "queued" | "making";
   placedAt?: string;
 };
@@ -993,12 +994,13 @@ export type COCKTAILS_QUERYResult = Array<{
   category: "aperitivo" | "gin" | "mezcal" | "rum" | "whiskey" | "zero-proof" | null;
 }>;
 // Variable: BAR_STATE_QUERY
-// Query: {  "open": coalesce(*[_type == "barSession"][0].open, false),  "orders": *[_type == "order"] | order(placedAt asc){    _id,    guestName,    status,    placedAt,    "cocktailId": cocktail._ref,    "cocktailName": cocktail->name  }}
+// Query: {  "open": coalesce(*[_type == "barSession"][0].open, false),  "orders": *[_type == "order"] | order(placedAt asc){    _id,    guestName,    notes,    status,    placedAt,    "cocktailId": cocktail._ref,    "cocktailName": cocktail->name  }}
 export type BAR_STATE_QUERYResult = {
   open: boolean | false;
   orders: Array<{
     _id: string;
     guestName: string | null;
+    notes: string | null;
     status: "making" | "queued" | null;
     placedAt: string | null;
     cocktailId: string | null;
@@ -1042,7 +1044,7 @@ declare module "@sanity/client" {
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
     "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
     "*[\n  _type == \"cocktail\" && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n] | order(name asc){\n  _id,\n  name,\n  description,\n  \"ingredients\": ingredients[]{\"name\": coalesce(label, ingredient->name)}.name,\n  category,\n}": COCKTAILS_QUERYResult;
-    "{\n  \"open\": coalesce(*[_type == \"barSession\"][0].open, false),\n  \"orders\": *[_type == \"order\"] | order(placedAt asc){\n    _id,\n    guestName,\n    status,\n    placedAt,\n    \"cocktailId\": cocktail._ref,\n    \"cocktailName\": cocktail->name\n  }\n}": BAR_STATE_QUERYResult;
+    "{\n  \"open\": coalesce(*[_type == \"barSession\"][0].open, false),\n  \"orders\": *[_type == \"order\"] | order(placedAt asc){\n    _id,\n    guestName,\n    notes,\n    status,\n    placedAt,\n    \"cocktailId\": cocktail._ref,\n    \"cocktailName\": cocktail->name\n  }\n}": BAR_STATE_QUERYResult;
     "coalesce(*[_type == \"barSession\"][0].open, false)": BAR_OPEN_QUERYResult;
     "*[\n  _type == \"order\" && _id == $orderId\n][0]{\n  _id,\n  guestId,\n  status,\n  \"cocktailName\": cocktail->name\n}": ORDER_BY_ID_QUERYResult;
     "*[\n  _type == \"cocktail\" && _id == $cocktailId && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;

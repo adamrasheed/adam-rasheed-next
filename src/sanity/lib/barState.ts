@@ -18,7 +18,8 @@ function toBarState(result: BAR_STATE_QUERYResult): BarState {
   return {
     open: result.open === true,
     orders: result.orders.flatMap((order) => {
-      const { guestName, cocktailId, cocktailName, status, placedAt } = order;
+      const { guestName, cocktailId, cocktailName, notes, status, placedAt } =
+        order;
 
       if (!guestName || !cocktailId || !cocktailName || !placedAt) return [];
       if (!isOrderStatus(status)) return [];
@@ -29,6 +30,7 @@ function toBarState(result: BAR_STATE_QUERYResult): BarState {
           guestName,
           cocktailId,
           cocktailName,
+          notes: notes?.trim() || null,
           status,
           placedAt,
         },

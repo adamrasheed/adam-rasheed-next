@@ -16,6 +16,9 @@ type BarMenuProps = {
   initialState: BarState;
 };
 
+const MAX_NAME_LENGTH = 40;
+const MAX_NOTES_LENGTH = 140;
+
 async function readError(response: Response) {
   try {
     const data: unknown = await response.json();
@@ -37,14 +40,15 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
 
   const [guest, setGuest] = useState<Guest | null>(null);
   const [nameDraft, setNameDraft] = useState("");
-  const [askingName, setAskingName] = useState(false);
-  const [pendingCocktailId, setPendingCocktailId] = useState<string | null>(
-    null
-  );
+  const [notesDraft, setNotesDraft] = useState("");
+  // The cocktail whose order form is open. Null means nothing is being composed.
+  const [composingId, setComposingId] = useState<string | null>(null);
+  const [renaming, setRenaming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const nameInput = useRef<HTMLInputElement>(null);
+  const renameInput = useRef<HTMLInputElement>(null);
+  const composeInput = useRef<HTMLInputElement>(null);
 
   // localStorage is not available during render on the server, so identity
   // arrives on the first client pass. Until then the page is a plain menu.
@@ -53,8 +57,13 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
   }, []);
 
   useEffect(() => {
-    if (askingName) nameInput.current?.focus();
-  }, [askingName]);
+    if (renaming) renameInput.current?.focus();
+  }, [renaming]);
+
+  // Whichever field leads the order form, the keyboard should land on it.
+  useEffect(() => {
+    if (composingId) composeInput.current?.focus();
+  }, [composingId]);
 
   const myOrderId = guest ? orderDocumentId(guest.id) : null;
   const myOrder = myOrderId
@@ -70,7 +79,14 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
     [cocktails]
   );
 
-  async function placeOrder(cocktailId: string, who: Guest) {
+  function closeCompose() {
+    setComposingId(null);
+    setNotesDraft("");
+    setNameDraft("");
+    setError(null);
+  }
+
+  async function placeOrder(cocktailId: string, who: Guest, notes: string) {
     setBusy(true);
     setError(null);
 
@@ -83,6 +99,7 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
           cocktailId,
           guestId: who.id,
           guestName: who.name,
+          notes,
         }),
       });
 
@@ -96,6 +113,10 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
     } finally {
       setBusy(false);
     }
+
+    // Only tear the form down once the order actually landed, so a rejected
+    // order keeps the note the guest typed.
+    closeCompose();
 
     await refresh();
   }
@@ -129,17 +150,32 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
   }
 
   function handleOrderClick(cocktailId: string) {
-    if (!guest) {
-      // Remember what they wanted so the name prompt isn't a dead end.
-      setPendingCocktailId(cocktailId);
-      setAskingName(true);
+    setComposingId(cocktailId);
+    setNameDraft(guest?.name ?? "");
+    setNotesDraft("");
+    setRenaming(false);
+    setError(null);
+  }
+
+  function handleComposeSubmit(event: React.FormEvent, cocktailId: string) {
+    event.preventDefault();
+
+    const trimmedName = nameDraft.trim();
+
+    if (!trimmedName) {
+      setError("I need a name to put on the drink.");
       return;
     }
 
-    placeOrder(cocktailId, guest);
+    // Saved on every order so a name edited in the form sticks for the next one.
+    const who = saveGuestName(trimmedName);
+
+    setGuest(who);
+
+    placeOrder(cocktailId, who, notesDraft.trim());
   }
 
-  function handleNameSubmit(event: React.FormEvent) {
+  function handleRenameSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const trimmed = nameDraft.trim();
@@ -149,16 +185,10 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
       return;
     }
 
-    const saved = saveGuestName(trimmed);
-    const wanted = pendingCocktailId;
-
-    setGuest(saved);
+    setGuest(saveGuestName(trimmed));
     setNameDraft("");
-    setAskingName(false);
-    setPendingCocktailId(null);
+    setRenaming(false);
     setError(null);
-
-    if (wanted) placeOrder(wanted, saved);
   }
 
   const errorId = error ? "bar-error" : undefined;
@@ -178,14 +208,14 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
 
         {state.open && <Queue orders={state.orders} myOrderId={myOrderId} />}
 
-        {state.open && askingName && (
-          <form onSubmit={handleNameSubmit} className="grid gap-2">
+        {state.open && renaming && (
+          <form onSubmit={handleRenameSubmit} className="grid gap-2">
             <label htmlFor="guest-name">Your name</label>
             <input
               id="guest-name"
-              ref={nameInput}
+              ref={renameInput}
               type="text"
-              maxLength={40}
+              maxLength={MAX_NAME_LENGTH}
               value={nameDraft}
               onChange={(event) => setNameDraft(event.target.value)}
               aria-describedby={errorId}
@@ -193,16 +223,13 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
             />
             <div className="flex gap-2">
               <button type="submit" className="btn primary">
-                {pendingCocktailId ? "Save and order" : "Save"}
+                Save
               </button>
-              {/* Without this, tapping Order and changing your mind traps you
-                  in the form with no way back to the menu. */}
               <button
                 type="button"
                 className="btn"
                 onClick={() => {
-                  setAskingName(false);
-                  setPendingCocktailId(null);
+                  setRenaming(false);
                   setNameDraft("");
                   setError(null);
                 }}
@@ -213,7 +240,7 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
           </form>
         )}
 
-        {state.open && guest && !askingName && (
+        {state.open && guest && !renaming && (
           <p className="text-sm text-gray-500">
             Ordering as {guest.name}.{" "}
             <button
@@ -221,7 +248,8 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
               className="underline font-bold"
               onClick={() => {
                 setNameDraft(guest.name);
-                setAskingName(true);
+                setComposingId(null);
+                setRenaming(true);
               }}
             >
               Change
@@ -234,10 +262,13 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
             {myOrder.status === "making"
               ? `Your ${myOrder.cocktailName} is being made.`
               : `Your ${myOrder.cocktailName} is in the queue. One drink at a time, so cancel it to switch.`}
+            {myOrder.notes && (
+              <span className="text-gray-500"> Asked for: {myOrder.notes}</span>
+            )}
           </p>
         )}
 
-        {error && (
+        {error && !composingId && (
           <p id="bar-error" role="alert" className="text-sm font-bold">
             {error}
           </p>
@@ -257,6 +288,10 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
               {section.cocktails.map((cocktail) => {
                 const isMine = myOrder?.cocktailId === cocktail._id;
                 const blocked = Boolean(myOrder) && !isMine;
+                const composing = composingId === cocktail._id;
+                const composeErrorId = composing && error
+                  ? `compose-error-${cocktail._id}`
+                  : undefined;
 
                 return (
                   <li
@@ -291,16 +326,88 @@ export default function BarMenu({ cocktails, initialState }: BarMenuProps) {
                             </button>
                           )
                         ) : (
+                          !composing && (
+                            <button
+                              type="button"
+                              className="btn primary disabled:opacity-40"
+                              disabled={busy || blocked}
+                              onClick={() => handleOrderClick(cocktail._id)}
+                            >
+                              Order
+                            </button>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {state.open && composing && (
+                      <form
+                        onSubmit={(event) =>
+                          handleComposeSubmit(event, cocktail._id)
+                        }
+                        className="col-span-2 grid gap-2 border border-slate-300 dark:border-slate-700 p-4"
+                      >
+                        {!guest && (
+                          <>
+                            <label htmlFor={`order-name-${cocktail._id}`}>
+                              Your name
+                            </label>
+                            <input
+                              id={`order-name-${cocktail._id}`}
+                              ref={composeInput}
+                              type="text"
+                              maxLength={MAX_NAME_LENGTH}
+                              value={nameDraft}
+                              onChange={(event) =>
+                                setNameDraft(event.target.value)
+                              }
+                              aria-describedby={composeErrorId}
+                              autoComplete="given-name"
+                            />
+                          </>
+                        )}
+
+                        <label htmlFor={`order-notes-${cocktail._id}`}>
+                          Any changes?
+                        </label>
+                        <input
+                          id={`order-notes-${cocktail._id}`}
+                          ref={guest ? composeInput : undefined}
+                          type="text"
+                          maxLength={MAX_NOTES_LENGTH}
+                          value={notesDraft}
+                          onChange={(event) => setNotesDraft(event.target.value)}
+                          placeholder="Vodka instead of gin, no simple syrup"
+                          aria-describedby={composeErrorId}
+                        />
+
+                        {composeErrorId && (
+                          <p
+                            id={composeErrorId}
+                            role="alert"
+                            className="text-sm font-bold"
+                          >
+                            {error}
+                          </p>
+                        )}
+
+                        <div className="flex gap-2">
                           <button
-                            type="button"
-                            className="btn primary disabled:opacity-40"
-                            disabled={busy || blocked}
-                            onClick={() => handleOrderClick(cocktail._id)}
+                            type="submit"
+                            className="btn primary"
+                            disabled={busy}
                           >
                             Order
                           </button>
-                        )}
-                      </div>
+                          <button
+                            type="button"
+                            className="btn"
+                            onClick={closeCompose}
+                          >
+                            Never mind
+                          </button>
+                        </div>
+                      </form>
                     )}
                   </li>
                 );

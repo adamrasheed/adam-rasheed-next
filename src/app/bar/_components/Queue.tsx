@@ -35,6 +35,11 @@ export default function Queue({ orders, myOrderId }: QueueProps) {
                     {" "}
                     for {mine ? "you" : order.guestName}
                   </span>
+                  {order.notes && (
+                    <span className="block text-xs text-gray-500">
+                      {order.notes}
+                    </span>
+                  )}
                 </span>
                 <span
                   className={`text-xs small-caps ${
