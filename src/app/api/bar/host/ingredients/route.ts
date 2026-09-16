@@ -13,7 +13,7 @@ export async function PATCH(request: Request) {
 
   const writeClient = getBarWriteClient();
 
-  if (!writeClient) return fail("The bar isn't set up to take orders yet.", 500);
+  if (!writeClient) return fail("The bar isn't set up to change stock yet.", 500);
 
   const body = await readJsonObject(request);
 

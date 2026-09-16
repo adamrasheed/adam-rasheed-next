@@ -101,6 +101,10 @@ export default function Shelf({ shelf, onUnauthorized }: ShelfProps) {
       });
 
       if (response.status === 401) {
+        // The write never happened, so the row has to go back before the
+        // re-render: until that lands the console would otherwise show a
+        // change the shelf never took.
+        revert(item._id);
         onUnauthorized();
         return;
       }
