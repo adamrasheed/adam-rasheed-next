@@ -11,7 +11,9 @@ export const metadata = {
 };
 
 type BarHostPageProps = {
-  searchParams: { error?: string };
+  // Next hands back an array when a query param repeats (?error=a&error=b),
+  // so the raw value is not a string just because one is expected.
+  searchParams: { error?: string | string[] };
 };
 
 // Pinned rather than left to inference. isHostAuthed reads the session cookie,
@@ -32,12 +34,21 @@ export default async function BarHostPage({ searchParams }: BarHostPageProps) {
 
       {!configured && (
         <p className="text-sm">
-          Set <code>BAR_HOST_EMAIL</code>, <code>AUTH_GOOGLE_ID</code>, and{" "}
-          <code>AUTH_GOOGLE_SECRET</code> in the environment to use this page.
+          Set <code>BAR_HOST_EMAIL</code>, <code>AUTH_SECRET</code>,{" "}
+          <code>AUTH_GOOGLE_ID</code>, and <code>AUTH_GOOGLE_SECRET</code> in
+          the environment to use this page.
         </p>
       )}
 
-      {configured && !authed && <HostLogin error={searchParams.error} />}
+      {configured && !authed && (
+        <HostLogin
+          error={
+            Array.isArray(searchParams.error)
+              ? searchParams.error[0]
+              : searchParams.error
+          }
+        />
+      )}
 
       {authed && initialState && (
         <HostConsole

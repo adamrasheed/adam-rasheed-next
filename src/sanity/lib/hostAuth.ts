@@ -4,16 +4,26 @@ import { auth, getHostEmail } from "@/auth";
 
 export { getHostEmail };
 
+/** Set to something that is not just whitespace. */
+function isSet(value: string | undefined) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 /**
- * Is the console wired up at all? A missing Google credential or allowed
- * address means nobody can sign in, and the page says so rather than showing a
- * button that cannot work.
+ * Is the console wired up at all? The page says so rather than showing a button
+ * that cannot work.
+ *
+ * AUTH_SECRET is in here alongside the Google credentials because leaving it
+ * out fails later and worse: the sign-in button renders, Google hands back a
+ * valid code, and Auth.js then cannot sign the session. A half-configured
+ * deploy should say so on the page, not at the end of a round trip.
  */
 export function isHostConfigured() {
   return Boolean(
     getHostEmail() &&
-      process.env.AUTH_GOOGLE_ID &&
-      process.env.AUTH_GOOGLE_SECRET
+      isSet(process.env.AUTH_SECRET) &&
+      isSet(process.env.AUTH_GOOGLE_ID) &&
+      isSet(process.env.AUTH_GOOGLE_SECRET)
   );
 }
 
