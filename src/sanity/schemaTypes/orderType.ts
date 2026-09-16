@@ -31,6 +31,14 @@ export const orderType = defineType({
       readOnly: true,
     },
     {
+      name: "notes",
+      title: "Notes",
+      type: "string",
+      description:
+        "What the guest wants done differently: a swapped spirit, no simple syrup, extra ice.",
+      validation: (Rule) => Rule.max(140),
+    },
+    {
       name: "status",
       title: "Status",
       type: "string",
@@ -61,11 +69,12 @@ export const orderType = defineType({
       guestName: "guestName",
       cocktailName: "cocktail.name",
       status: "status",
+      notes: "notes",
     },
-    prepare({ guestName, cocktailName, status }) {
+    prepare({ guestName, cocktailName, status, notes }) {
       return {
         title: `${cocktailName ?? "Unknown drink"} for ${guestName}`,
-        subtitle: status,
+        subtitle: notes ? `${status} · ${notes}` : status,
       };
     },
   },

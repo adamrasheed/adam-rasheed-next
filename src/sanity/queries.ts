@@ -245,6 +245,7 @@ export const BAR_STATE_QUERY = defineQuery(`{
   "orders": *[_type == "order"] | order(placedAt asc){
     _id,
     guestName,
+    notes,
     status,
     placedAt,
     "cocktailId": cocktail._ref,

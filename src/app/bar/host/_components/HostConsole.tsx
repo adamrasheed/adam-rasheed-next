@@ -166,6 +166,9 @@ export default function HostConsole({ initialState }: HostConsoleProps) {
                   </p>
                   <p className="text-lg font-bold">{order.cocktailName}</p>
                   <p className="text-sm text-gray-500">for {order.guestName}</p>
+                  {order.notes && (
+                    <p className="text-sm font-bold mt-2">{order.notes}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
