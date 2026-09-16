@@ -109,10 +109,14 @@ const ALIASES = new Map(
 );
 
 /**
- * Strings that are only ever a garnish on this menu, so the drink still gets
- * made without them. Exact normalized strings, plus the patterns
- * below, and deliberately not a property of the ingredient: "Luxardo cherry" is
- * a garnish on a Manhattan while "Luxardo cherry syrup" carries the Rickey.
+ * Strings the drink still gets made without. Mostly garnishes, but not by
+ * definition: the test is whether running out should take the cocktail off the
+ * menu, and a component can fail that test for a reason of its own (see the
+ * Sauvignon Blanc float below).
+ *
+ * Exact normalized strings, plus the patterns below, and deliberately not a
+ * property of the ingredient: "Luxardo cherry" is a garnish on a Manhattan
+ * while "Luxardo cherry syrup" carries the Rickey.
  */
 const OPTIONAL_STRINGS = new Set(
   [
