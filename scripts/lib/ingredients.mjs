@@ -109,10 +109,14 @@ const ALIASES = new Map(
 );
 
 /**
- * Strings that are only ever a garnish on this menu, so the drink still gets
- * made without them. Exact normalized strings, plus the patterns
- * below, and deliberately not a property of the ingredient: "Luxardo cherry" is
- * a garnish on a Manhattan while "Luxardo cherry syrup" carries the Rickey.
+ * Strings the drink still gets made without. Mostly garnishes, but not by
+ * definition: the test is whether running out should take the cocktail off the
+ * menu, and a component can fail that test for a reason of its own (see the
+ * Sauvignon Blanc float below).
+ *
+ * Exact normalized strings, plus the patterns below, and deliberately not a
+ * property of the ingredient: "Luxardo cherry" is a garnish on a Manhattan
+ * while "Luxardo cherry syrup" carries the Rickey.
  */
 const OPTIONAL_STRINGS = new Set(
   [
@@ -121,11 +125,16 @@ const OPTIONAL_STRINGS = new Set(
     "luxardo cherry",
     "castelvetrano olives",
     "castelvetrano olives or lemon twist",
+    // Not because a float is a garnish, but because of what it points at: the
+    // only wine on the shelf is one "type unspecified" entry, so its stock flag
+    // cannot tell us whether there is Sauvignon Blanc in particular. Required
+    // here would 86 the Crisp Martini off a signal that never meant that.
+    "sauvignon blanc float",
   ].map(normalizeName),
 );
 
-// Deliberately no "float": a float is a component of the drink, not a garnish.
-// The Crisp Martini without its Sauvignon Blanc is a different cocktail.
+// Deliberately no "float" in the patterns: a float is a component of the drink,
+// not a garnish, so it stays required unless a specific drink is listed above.
 const OPTIONAL_PATTERNS = /\b(twist|peel|wedge|slice|garnish)\b/;
 
 /** Is this written ingredient a garnish rather than something the drink needs? */
