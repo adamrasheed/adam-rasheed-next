@@ -1,5 +1,6 @@
 import { signOut } from "@/auth";
 import { getBarState } from "@/sanity/lib/barState";
+import { getHostShelf } from "@/sanity/lib/hostShelf";
 import { isHostAuthed, isHostConfigured } from "@/sanity/lib/hostAuth";
 
 import HostConsole from "./_components/HostConsole";
@@ -26,7 +27,9 @@ export const dynamic = "force-dynamic";
 export default async function BarHostPage({ searchParams }: BarHostPageProps) {
   const configured = isHostConfigured();
   const authed = configured && (await isHostAuthed());
-  const initialState = authed ? await getBarState() : null;
+  const [initialState, shelf] = authed
+    ? await Promise.all([getBarState(), getHostShelf()])
+    : [null, null];
 
   return (
     <div className="page-container sml">
@@ -50,9 +53,10 @@ export default async function BarHostPage({ searchParams }: BarHostPageProps) {
         />
       )}
 
-      {authed && initialState && (
+      {authed && initialState && shelf && (
         <HostConsole
           initialState={initialState}
+          shelf={shelf}
           signOutAction={async () => {
             "use server";
 
