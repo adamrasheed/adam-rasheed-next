@@ -1027,6 +1027,22 @@ export type ORDERABLE_COCKTAIL_QUERYResult = {
 // Variable: ORDER_COUNT_QUERY
 // Query: count(*[_type == "order"])
 export type ORDER_COUNT_QUERYResult = number;
+// Variable: HOST_SHELF_QUERY
+// Query: {  "ingredients": *[_type == "ingredient"] | order(name asc){    _id,    name,    category,    "inStock": inStock == true  },  "cocktails": *[_type == "cocktail" && available != false && count(ingredients) > 0]{    _id,    name,    "requires": ingredients[optional != true].ingredient._ref,    "garnishes": ingredients[optional == true].ingredient._ref  }}
+export type HOST_SHELF_QUERYResult = {
+  ingredients: Array<{
+    _id: string;
+    name: string | null;
+    category: "bitters" | "fresh" | "liqueur" | "mixer" | "spirit" | "sweetener" | "vermouth-wine" | null;
+    inStock: boolean | false;
+  }>;
+  cocktails: Array<{
+    _id: string;
+    name: string | null;
+    requires: Array<string | null> | null;
+    garnishes: Array<string | null> | null;
+  }>;
+};
 
 // Query TypeMap
 import "@sanity/client";
@@ -1049,5 +1065,6 @@ declare module "@sanity/client" {
     "*[\n  _type == \"order\" && _id == $orderId\n][0]{\n  _id,\n  guestId,\n  status,\n  \"cocktailName\": cocktail->name\n}": ORDER_BY_ID_QUERYResult;
     "*[\n  _type == \"cocktail\" && _id == $cocktailId && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;
     "count(*[_type == \"order\"])": ORDER_COUNT_QUERYResult;
+    "{\n  \"ingredients\": *[_type == \"ingredient\"] | order(name asc){\n    _id,\n    name,\n    category,\n    \"inStock\": inStock == true\n  },\n  \"cocktails\": *[_type == \"cocktail\" && available != false && count(ingredients) > 0]{\n    _id,\n    name,\n    \"requires\": ingredients[optional != true].ingredient._ref,\n    \"garnishes\": ingredients[optional == true].ingredient._ref\n  }\n}": HOST_SHELF_QUERYResult;
   }
 }

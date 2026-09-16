@@ -278,3 +278,35 @@ export const ORDERABLE_COCKTAIL_QUERY = defineQuery(`*[
 }`);
 
 export const ORDER_COUNT_QUERY = defineQuery(`count(*[_type == "order"])`);
+
+// The shelf as the host console needs it: every ingredient with its stock flag,
+// plus enough of each cocktail to work out what a toggle would cost. Host-only,
+// so it is deliberately not part of BAR_STATE_QUERY, which every guest polls
+// every five seconds.
+//
+// `requires` lists only the non-optional refs, because those are the ones that
+// decide the menu. A garnish going out changes nothing, and showing it as a
+// consequence would train the host to ignore the warning. `garnishes` carries
+// the optional refs anyway, so the console can tell "only ever a garnish" apart
+// from "nothing uses this" — the two read identically from `requires` alone,
+// and conflating them would call a bottle dead stock when it garnishes seven
+// drinks.
+//
+// The filter mirrors COCKTAIL_IN_STOCK's non-stock half exactly, including the
+// count(ingredients) > 0 guard. Without it a cocktail with an empty ingredient
+// list has nothing missing, so the console would count it toward "on the menu"
+// while /bar hides it, and the two rules would disagree about the same bar.
+export const HOST_SHELF_QUERY = defineQuery(`{
+  "ingredients": *[_type == "ingredient"] | order(name asc){
+    _id,
+    name,
+    category,
+    "inStock": inStock == true
+  },
+  "cocktails": *[_type == "cocktail" && available != false && count(ingredients) > 0]{
+    _id,
+    name,
+    "requires": ingredients[optional != true].ingredient._ref,
+    "garnishes": ingredients[optional == true].ingredient._ref
+  }
+}`);

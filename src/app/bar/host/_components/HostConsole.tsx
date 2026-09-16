@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { BarState } from "@/sanity/barTypes";
+import type { HostShelf } from "@/sanity/lib/hostShelf";
 
 import { useBarState } from "../../_lib/useBarState";
+import Shelf from "./Shelf";
 
 type HostConsoleProps = {
   initialState: BarState;
+  shelf: HostShelf;
   /** Server action: clears the Auth.js session and returns to the sign-in. */
   signOutAction: () => Promise<void>;
 };
@@ -31,6 +34,7 @@ async function readError(response: Response, fallback: string) {
 
 export default function HostConsole({
   initialState,
+  shelf,
   signOutAction,
 }: HostConsoleProps) {
   const router = useRouter();
@@ -200,6 +204,8 @@ export default function HostConsole({
           </ol>
         )}
       </section>
+
+      <Shelf shelf={shelf} onUnauthorized={() => router.refresh()} />
 
       <div className="grid gap-3 border-t border-slate-300 dark:border-slate-700 pt-6">
         {confirmingClear ? (
