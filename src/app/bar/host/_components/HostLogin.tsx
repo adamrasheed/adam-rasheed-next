@@ -1,83 +1,39 @@
-"use client";
+import { signIn } from "@/auth";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+type HostLoginProps = {
+  /** Auth.js error code from the query string, if it bounced a sign-in. */
+  error?: string;
+};
 
-export default function HostLogin() {
-  const router = useRouter();
-
-  const [passcode, setPasscode] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-
-    if (!passcode.trim()) {
-      setError("Enter the passcode.");
-      return;
-    }
-
-    setBusy(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/bar/host/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-        body: JSON.stringify({ passcode }),
-      });
-
-      if (!response.ok) {
-        let message = "Wrong passcode.";
-
-        try {
-          const data: unknown = await response.json();
-
-          if (typeof data === "object" && data !== null && "error" in data) {
-            const value = (data as { error: unknown }).error;
-
-            if (typeof value === "string") message = value;
-          }
-        } catch {
-          // Non-JSON body. Keep the default message.
-        }
-
-        setError(message);
-        return;
-      }
-
-      setPasscode("");
-      router.refresh();
-    } catch {
-      setError("Lost the connection. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
+export default function HostLogin({ error }: HostLoginProps) {
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 max-w-xs">
-      <label htmlFor="host-passcode">Passcode</label>
-      <input
-        id="host-passcode"
-        type="password"
-        value={passcode}
-        onChange={(event) => setPasscode(event.target.value)}
-        aria-describedby={error ? "host-passcode-error" : undefined}
-        autoComplete="current-password"
-      />
-
-      {error && (
-        <p id="host-passcode-error" role="alert" className="text-sm font-bold">
-          {error}
+    <div className="grid gap-4 max-w-xs">
+      {/* AccessDenied is the signIn callback refusing an address that is not
+          the host's, which is the only rejection worth explaining: it means the
+          wrong Google account is signed in on this phone, not that anything is
+          broken. */}
+      {error === "AccessDenied" ? (
+        <p role="alert" className="text-sm font-bold">
+          That Google account isn&apos;t the one behind the bar. Switch accounts
+          and try again.
         </p>
-      )}
+      ) : error ? (
+        <p role="alert" className="text-sm font-bold">
+          Sign-in didn&apos;t go through. Try again.
+        </p>
+      ) : null}
 
-      <button type="submit" className="btn primary" disabled={busy}>
-        {busy ? "Checking" : "Sign in"}
-      </button>
-    </form>
+      <form
+        action={async () => {
+          "use server";
+
+          await signIn("google", { redirectTo: "/bar/host" });
+        }}
+      >
+        <button type="submit" className="btn primary w-full py-4 text-base">
+          Sign in with Google
+        </button>
+      </form>
+    </div>
   );
 }

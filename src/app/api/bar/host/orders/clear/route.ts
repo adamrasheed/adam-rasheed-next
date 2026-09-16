@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 /** Wipe the whole queue at the end of the night. */
 export async function POST() {
-  if (!isHostAuthed()) return fail("Not signed in.", 401);
+  if (!(await isHostAuthed())) return fail("Not signed in.", 401);
 
   const writeClient = getBarWriteClient();
 

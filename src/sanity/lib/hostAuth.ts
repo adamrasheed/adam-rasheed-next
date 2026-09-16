@@ -1,50 +1,37 @@
 import "server-only";
 
-import { createHash, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
+import { auth, getHostEmail } from "@/auth";
 
-export const HOST_COOKIE = "bar_host";
-export const HOST_COOKIE_MAX_AGE = 60 * 60 * 12; // one long night
+export { getHostEmail };
 
 /**
- * The cookie is a hash of the passcode, not the passcode itself, so a reused
- * passcode never sits in plaintext on the guest's machine. It is still a bearer
- * token: holding the cookie is equivalent to knowing the passcode, which is the
- * intended strength for a party console.
+ * Is the console wired up at all? A missing Google credential or allowed
+ * address means nobody can sign in, and the page says so rather than showing a
+ * button that cannot work.
  */
-export function hostCookieValue(passcode: string) {
-  return createHash("sha256").update(`bar-host:${passcode}`).digest("hex");
+export function isHostConfigured() {
+  return Boolean(
+    getHostEmail() &&
+      process.env.AUTH_GOOGLE_ID &&
+      process.env.AUTH_GOOGLE_SECRET
+  );
 }
 
-export function getHostPasscode() {
-  const passcode = process.env.BAR_HOST_PASSCODE;
+/**
+ * The one gate every host surface goes through: the page and each host API
+ * route. The signIn callback already refuses to mint a session for anyone else,
+ * so this is the second of two checks. It is here because the first one runs
+ * once at sign-in while this one runs on every request, which is what makes
+ * changing BAR_HOST_EMAIL take effect immediately instead of whenever the
+ * existing session happens to expire.
+ */
+export async function isHostAuthed() {
+  const allowed = getHostEmail();
 
-  return typeof passcode === "string" && passcode.length > 0 ? passcode : null;
-}
+  if (!allowed) return false;
 
-function safeEqual(a: string, b: string) {
-  const left = Buffer.from(a);
-  const right = Buffer.from(b);
+  const session = await auth();
+  const email = session?.user?.email;
 
-  if (left.length !== right.length) return false;
-
-  return timingSafeEqual(left, right);
-}
-
-export function isPasscodeCorrect(candidate: string) {
-  const passcode = getHostPasscode();
-
-  return passcode !== null && safeEqual(candidate, passcode);
-}
-
-export function isHostAuthed() {
-  const passcode = getHostPasscode();
-
-  if (!passcode) return false;
-
-  const cookie = cookies().get(HOST_COOKIE)?.value;
-
-  if (!cookie) return false;
-
-  return safeEqual(cookie, hostCookieValue(passcode));
+  return typeof email === "string" && email.toLowerCase() === allowed;
 }

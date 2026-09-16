@@ -20,7 +20,7 @@ async function findOrder(orderId: string) {
 
 /** Move an order between queued and making. */
 export async function PATCH(request: Request) {
-  if (!isHostAuthed()) return fail("Not signed in.", 401);
+  if (!(await isHostAuthed())) return fail("Not signed in.", 401);
 
   const writeClient = getBarWriteClient();
 
@@ -56,7 +56,7 @@ export async function PATCH(request: Request) {
  * guest to order their next one.
  */
 export async function DELETE(request: Request) {
-  if (!isHostAuthed()) return fail("Not signed in.", 401);
+  if (!(await isHostAuthed())) return fail("Not signed in.", 401);
 
   const writeClient = getBarWriteClient();
 
