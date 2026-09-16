@@ -13,7 +13,7 @@ const SESSION_TYPE = "barSession";
 
 /** Open or close the bar. */
 export async function POST(request: Request) {
-  if (!isHostAuthed()) return fail("Not signed in.", 401);
+  if (!(await isHostAuthed())) return fail("Not signed in.", 401);
 
   const writeClient = getBarWriteClient();
 

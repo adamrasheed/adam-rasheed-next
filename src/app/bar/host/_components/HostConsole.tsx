@@ -9,6 +9,8 @@ import { useBarState } from "../../_lib/useBarState";
 
 type HostConsoleProps = {
   initialState: BarState;
+  /** Server action: clears the Auth.js session and returns to the sign-in. */
+  signOutAction: () => Promise<void>;
 };
 
 async function readError(response: Response, fallback: string) {
@@ -27,7 +29,10 @@ async function readError(response: Response, fallback: string) {
   return fallback;
 }
 
-export default function HostConsole({ initialState }: HostConsoleProps) {
+export default function HostConsole({
+  initialState,
+  signOutAction,
+}: HostConsoleProps) {
   const router = useRouter();
   const { state, reachable, refresh } = useBarState(initialState);
 
@@ -112,10 +117,6 @@ export default function HostConsole({ initialState }: HostConsoleProps) {
     if (done) await refresh();
   }
 
-  async function signOut() {
-    await send("/api/bar/host/auth", { method: "DELETE" }, "Couldn't sign out.");
-    router.refresh();
-  }
 
   return (
     <div className="grid gap-8">
@@ -235,13 +236,11 @@ export default function HostConsole({ initialState }: HostConsoleProps) {
           </button>
         )}
 
-        <button
-          type="button"
-          className="text-sm underline font-bold justify-self-start"
-          onClick={signOut}
-        >
-          Sign out
-        </button>
+        <form action={signOutAction} className="justify-self-start">
+          <button type="submit" className="text-sm underline font-bold">
+            Sign out
+          </button>
+        </form>
       </div>
     </div>
   );
