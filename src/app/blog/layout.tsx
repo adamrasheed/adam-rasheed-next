@@ -3,6 +3,7 @@ import PageWrapper from "../_components/PageWrapper";
 export const metadata = {
   title: "Blog",
   description: "Adam Rasheed blog about software engineering, travel, and more",
+  alternates: { types: { "application/rss+xml": "/blog/rss.xml" } },
 };
 
 export default async function BlogLayout({

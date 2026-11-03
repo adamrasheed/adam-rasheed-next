@@ -30,8 +30,6 @@ export async function sanityFetch<QueryResponse>({
 }) {
   const isDraftMode = draftMode().isEnabled;
 
-  console.log("isDraftMode", isDraftMode);
-
   if (isDraftMode && !token) {
     throw new Error("Missing environment variable SANITY_API_READ_TOKEN");
   }
@@ -43,11 +41,13 @@ export async function sanityFetch<QueryResponse>({
     queryOptions.token = token;
     queryOptions.perspective = "previewDrafts";
     queryOptions.stega = true;
+    queryOptions.useCdn = false;
 
     maybeRevalidate = 0; // Do not cache in Draft Mode
-  } else if (tags.length) {
-    maybeRevalidate = false; // Cache indefinitely if tags supplied
   }
+  // Tags let /api/revalidate refresh pages the moment content is published.
+  // `revalidate` stays as the fallback so a missing webhook means a minute of
+  // staleness, not pages frozen forever.
 
   return client.fetch<QueryResponse>(query, params, {
     ...queryOptions,

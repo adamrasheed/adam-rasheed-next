@@ -20,6 +20,7 @@ export default async function BlogsPage({ searchParams }: PageProps) {
 
   const categories = await sanityFetch<CATEGORIES_QUERYResult>({
     query: CATEGORIES_QUERY,
+    tags: ["category"],
   });
 
   const posts = await sanityFetch<POSTS_PREVIEW_BY_SLUG_QUERYResult>({
@@ -27,6 +28,7 @@ export default async function BlogsPage({ searchParams }: PageProps) {
     params: {
       categorySlug: category || null,
     },
+    tags: ["post", "category"],
   });
 
   return <PostListings posts={posts} categories={categories} />;

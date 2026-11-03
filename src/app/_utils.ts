@@ -1,6 +1,7 @@
 export const PATH_NAMES = {
   ABOUT: "About",
   BLOG: "Blog",
+  TRAVEL: "Travel",
   CASE_STUDIES: "Case Studies",
   CERAMICS: "Ceramics",
   FREELANCE: "Freelance",
@@ -8,6 +9,7 @@ export const PATH_NAMES = {
 export const PATHS = {
   ABOUT: "/about",
   BLOG: "/blog",
+  TRAVEL: "/travel",
   CASE_STUDIES: "/case-studies",
   CERAMICS: "https://adamrasheed.studio/",
   FREELANCE: "/freelance",
@@ -27,6 +29,10 @@ export const ROUTES = [
     href: PATHS.BLOG,
   },
   {
+    label: PATH_NAMES.TRAVEL,
+    href: PATHS.TRAVEL,
+  },
+  {
     label: PATH_NAMES.CERAMICS,
     href: PATHS.CERAMICS,
     external: true,
@@ -40,6 +46,10 @@ export const getFormattedDate = (date: string) => {
     day: "numeric",
   });
 };
+
+// 225 wpm is the usual adult silent-reading estimate.
+export const getReadingMinutes = (text: string | null | undefined) =>
+  Math.max(1, Math.round((text?.trim().split(/\s+/).length ?? 0) / 225));
 
 export const slugifyHeading = (text: string) =>
   text

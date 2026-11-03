@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { SITE_URL } from "@/constants";
 import "../styles/globals.css";
@@ -30,6 +32,17 @@ export default function RootLayout({
         )}
       >
         {children}
+        {draftMode().isEnabled && (
+          <>
+            <VisualEditing />
+            <a
+              href="/api/draft-mode/disable"
+              className="fixed bottom-4 right-4 z-50 rounded bg-slate-900 px-3 py-2 text-xs text-white"
+            >
+              Exit draft preview
+            </a>
+          </>
+        )}
       </body>
     </html>
   );

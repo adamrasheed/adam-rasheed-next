@@ -254,7 +254,7 @@ export type Page = {
       _key: string;
     }>;
     style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-    listItem?: "bullet";
+    listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
       _type: "link";
@@ -273,7 +273,48 @@ export type Page = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
+    _key: string;
+  } | {
+    images?: Array<{
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    perRow?: 1 | 2 | 3 | 4;
+    caption?: string;
+    _type: "gallery";
+    _key: string;
+  } | {
+    filename?: string;
+    language?: "ts" | "tsx" | "js" | "jsx" | "json" | "bash" | "css" | "html" | "liquid" | "graphql" | "swift" | "python" | "text";
+    code?: string;
+    _type: "codeBlock";
+    _key: string;
+  } | {
+    rows?: Array<{
+      cells?: Array<string>;
+      _type: "row";
+      _key: string;
+    }>;
+    hasHeader?: boolean;
+    caption?: string;
+    _type: "table";
+    _key: string;
+  } | {
+    url?: string;
+    caption?: string;
+    _type: "embed";
     _key: string;
   }>;
 };
@@ -297,7 +338,14 @@ export type Post = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
+  };
+  author?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "author";
   };
   categories?: Array<{
     _ref: string;
@@ -306,7 +354,9 @@ export type Post = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "category";
   }>;
+  tags?: Array<string>;
   publishedAt?: string;
+  updatedAt?: string;
   body?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -315,7 +365,7 @@ export type Post = {
       _key: string;
     }>;
     style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-    listItem?: "bullet";
+    listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
       _type: "link";
@@ -334,9 +384,76 @@ export type Post = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
     _key: string;
+  } | {
+    images?: Array<{
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    perRow?: 1 | 2 | 3 | 4;
+    caption?: string;
+    _type: "gallery";
+    _key: string;
+  } | {
+    filename?: string;
+    language?: "ts" | "tsx" | "js" | "jsx" | "json" | "bash" | "css" | "html" | "liquid" | "graphql" | "swift" | "python" | "text";
+    code?: string;
+    _type: "codeBlock";
+    _key: string;
+  } | {
+    rows?: Array<{
+      cells?: Array<string>;
+      _type: "row";
+      _key: string;
+    }>;
+    hasHeader?: boolean;
+    caption?: string;
+    _type: "table";
+    _key: string;
+  } | {
+    url?: string;
+    caption?: string;
+    _type: "embed";
+    _key: string;
   }>;
+  seoTitle?: string;
+  seoDescription?: string;
+};
+
+export type Author = {
+  _id: string;
+  _type: "author";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  role?: string;
+  image?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  bio?: string;
+  email?: string;
 };
 
 export type Contribution = {
@@ -366,7 +483,7 @@ export type About = {
       _key: string;
     }>;
     style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-    listItem?: "bullet";
+    listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
       _type: "link";
@@ -385,7 +502,48 @@ export type About = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
+    _key: string;
+  } | {
+    images?: Array<{
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    perRow?: 1 | 2 | 3 | 4;
+    caption?: string;
+    _type: "gallery";
+    _key: string;
+  } | {
+    filename?: string;
+    language?: "ts" | "tsx" | "js" | "jsx" | "json" | "bash" | "css" | "html" | "liquid" | "graphql" | "swift" | "python" | "text";
+    code?: string;
+    _type: "codeBlock";
+    _key: string;
+  } | {
+    rows?: Array<{
+      cells?: Array<string>;
+      _type: "row";
+      _key: string;
+    }>;
+    hasHeader?: boolean;
+    caption?: string;
+    _type: "table";
+    _key: string;
+  } | {
+    url?: string;
+    caption?: string;
+    _type: "embed";
     _key: string;
   }>;
   mainImage?: {
@@ -430,7 +588,7 @@ export type BlockContent = Array<{
     _key: string;
   }>;
   style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-  listItem?: "bullet";
+  listItem?: "bullet" | "number";
   markDefs?: Array<{
     href?: string;
     _type: "link";
@@ -449,7 +607,48 @@ export type BlockContent = Array<{
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt?: string;
+  caption?: string;
   _type: "image";
+  _key: string;
+} | {
+  images?: Array<{
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  perRow?: 1 | 2 | 3 | 4;
+  caption?: string;
+  _type: "gallery";
+  _key: string;
+} | {
+  filename?: string;
+  language?: "ts" | "tsx" | "js" | "jsx" | "json" | "bash" | "css" | "html" | "liquid" | "graphql" | "swift" | "python" | "text";
+  code?: string;
+  _type: "codeBlock";
+  _key: string;
+} | {
+  rows?: Array<{
+    cells?: Array<string>;
+    _type: "row";
+    _key: string;
+  }>;
+  hasHeader?: boolean;
+  caption?: string;
+  _type: "table";
+  _key: string;
+} | {
+  url?: string;
+  caption?: string;
+  _type: "embed";
   _key: string;
 }>;
 
@@ -510,7 +709,7 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Order | BarSession | Cocktail | Ingredient | CaseStudy | Page | Post | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SiteInfo | Order | BarSession | Cocktail | Ingredient | CaseStudy | Page | Post | Author | Contribution | About | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: CASE_STUDIES_QUERY
@@ -643,12 +842,25 @@ export type CASE_STUDY_BY_SLUG_QUERYResult = {
   }> | null;
 } | null;
 // Variable: POSTS_PREVIEWS_QUERY
-// Query: *[_type == "post"] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}
+// Query: *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    slug  },  publishedAt,}
 export type POSTS_PREVIEWS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
   excerpt: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+  } | null;
   categories: Array<{
     _id: string;
     title: string | null;
@@ -657,25 +869,37 @@ export type POSTS_PREVIEWS_QUERYResult = Array<{
   publishedAt: string | null;
 }>;
 // Variable: SINGLE_POST_QUERY
-// Query: {    "post": *[_type == "post" && slug.current == $slug][0]{      _id,      title,      slug,      excerpt,      mainImage {        asset->{          url,          metadata        },        alt      },      categories[]->{        _id,        title      },      publishedAt,      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },        "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },        "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },    "author": *[_type == "siteInfo"][0]{      title,      email,      authorBio,      authorImage,      socialMedia    }  }
+// Query: {    "post": *[_type == "post" && slug.current == $slug && ($preview || publishedAt <= now())][0]{      _id,      title,      slug,      excerpt,      seoTitle,      seoDescription,      mainImage,      categories[]->{        _id,        title,        "slug": slug.current      },      tags,      publishedAt,      updatedAt,      "bodyText": pt::text(body),      body[]{        ...,        _type == "image" => {          "imageUrl": asset->url,          alt        }      }    },    "relatedPostsByCategory": *[_type == "post" && defined(slug.current) && publishedAt <= now() && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },    "fallbackPosts": *[_type == "post" && defined(slug.current) && publishedAt <= now() && slug.current != $slug] | order(publishedAt desc)[0...3]{      _id,      title,      slug,      excerpt,      publishedAt    },    // A post's own author wins; otherwise Site Info, mapped to the same shape.    "author": coalesce(      *[_type == "post" && slug.current == $slug][0].author->{        "name": name,        "title": role,        email,        "authorBio": bio,        "authorImage": image      },      *[_type == "siteInfo"][0]{        "name": null,        title,        email,        authorBio,        authorImage      }    )  }
 export type SINGLE_POST_QUERYResult = {
   post: {
     _id: string;
     title: string | null;
     slug: Slug | null;
     excerpt: string | null;
+    seoTitle: string | null;
+    seoDescription: string | null;
     mainImage: {
-      asset: {
-        url: string | null;
-        metadata: SanityImageMetadata | null;
-      } | null;
-      alt: string | null;
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
     } | null;
     categories: Array<{
       _id: string;
       title: string | null;
+      slug: string | null;
     }> | null;
+    tags: Array<string> | null;
     publishedAt: string | null;
+    updatedAt: string | null;
+    bodyText: string;
     body: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -684,7 +908,7 @@ export type SINGLE_POST_QUERYResult = {
         _key: string;
       }>;
       style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-      listItem?: "bullet";
+      listItem?: "bullet" | "number";
       markDefs?: Array<{
         href?: string;
         _type: "link";
@@ -692,6 +916,36 @@ export type SINGLE_POST_QUERYResult = {
       }>;
       level?: number;
       _type: "block";
+      _key: string;
+    } | {
+      filename?: string;
+      language?: "bash" | "css" | "graphql" | "html" | "js" | "json" | "jsx" | "liquid" | "python" | "swift" | "text" | "ts" | "tsx";
+      code?: string;
+      _type: "codeBlock";
+      _key: string;
+    } | {
+      url?: string;
+      caption?: string;
+      _type: "embed";
+      _key: string;
+    } | {
+      images?: Array<{
+        asset?: {
+          _ref: string;
+          _type: "reference";
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+        };
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        caption?: string;
+        _type: "image";
+        _key: string;
+      }>;
+      perRow?: 1 | 2 | 3 | 4;
+      caption?: string;
+      _type: "gallery";
       _key: string;
     } | {
       asset?: {
@@ -703,9 +957,20 @@ export type SINGLE_POST_QUERYResult = {
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
       alt: string | null;
+      caption?: string;
       _type: "image";
       _key: string;
       imageUrl: string | null;
+    } | {
+      rows?: Array<{
+        cells?: Array<string>;
+        _type: "row";
+        _key: string;
+      }>;
+      hasHeader?: boolean;
+      caption?: string;
+      _type: "table";
+      _key: string;
     }> | null;
   } | null;
   relatedPostsByCategory: Array<{
@@ -723,6 +988,7 @@ export type SINGLE_POST_QUERYResult = {
     publishedAt: string | null;
   }>;
   author: {
+    name: null;
     title: string | null;
     email: string | null;
     authorBio: string | null;
@@ -738,13 +1004,22 @@ export type SINGLE_POST_QUERYResult = {
       alt?: string;
       _type: "image";
     } | null;
-    socialMedia: {
-      x?: string;
-      instagram?: string;
-      linkedIn?: string;
-      github?: string;
-      youtube?: string;
-      dribbble?: string;
+  } | {
+    name: string | null;
+    title: string | null;
+    email: string | null;
+    authorBio: string | null;
+    authorImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
     } | null;
   } | null;
 };
@@ -762,7 +1037,7 @@ export type PAGE_QUERYResult = {
       _key: string;
     }>;
     style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
+    listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
       _type: "link";
@@ -770,6 +1045,36 @@ export type PAGE_QUERYResult = {
     }>;
     level?: number;
     _type: "block";
+    _key: string;
+  } | {
+    filename?: string;
+    language?: "bash" | "css" | "graphql" | "html" | "js" | "json" | "jsx" | "liquid" | "python" | "swift" | "text" | "ts" | "tsx";
+    code?: string;
+    _type: "codeBlock";
+    _key: string;
+  } | {
+    url?: string;
+    caption?: string;
+    _type: "embed";
+    _key: string;
+  } | {
+    images?: Array<{
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    perRow?: 1 | 2 | 3 | 4;
+    caption?: string;
+    _type: "gallery";
     _key: string;
   } | {
     asset?: {
@@ -781,9 +1086,20 @@ export type PAGE_QUERYResult = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt: string | null;
+    caption?: string;
     _type: "image";
     _key: string;
     imageUrl: string | null;
+  } | {
+    rows?: Array<{
+      cells?: Array<string>;
+      _type: "row";
+      _key: string;
+    }>;
+    hasHeader?: boolean;
+    caption?: string;
+    _type: "table";
+    _key: string;
   }> | null;
 } | null;
 // Variable: SITE_INFO_QUERY
@@ -821,7 +1137,7 @@ export type SITE_INFO_QUERYResult = {
   } | null;
 } | null;
 // Variable: HOME_QUERY
-// Query: {  "siteInfo": *[_type == "siteInfo"][0]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia},  "caseStudies": *[_type == "caseStudy"] | order(_createdAt desc){  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}[0...2],  "posts": *[_type == "post"] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  categories[]->{    _id,    title,    slug  },  publishedAt,}[0...2],}
+// Query: {  "siteInfo": *[_type == "siteInfo"][0]{  _id,  title,  email,  resume,  description[]{    ...,  },  socialMedia},  "caseStudies": *[_type == "caseStudy"] | order(_createdAt desc){  _id,  title,  subtitle,  teaser,  slug,  mainImage {    ...,    metadata  }}[0...2],  "posts": *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    slug  },  publishedAt,}[0...2],}
 export type HOME_QUERYResult = {
   siteInfo: {
     _id: string;
@@ -881,6 +1197,19 @@ export type HOME_QUERYResult = {
     title: string | null;
     slug: Slug | null;
     excerpt: string | null;
+    mainImage: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+    } | null;
     categories: Array<{
       _id: string;
       title: string | null;
@@ -903,7 +1232,7 @@ export type ABOUT_QUERYResult = {
       _key: string;
     }>;
     style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
+    listItem?: "bullet" | "number";
     markDefs?: Array<{
       href?: string;
       _type: "link";
@@ -911,6 +1240,36 @@ export type ABOUT_QUERYResult = {
     }>;
     level?: number;
     _type: "block";
+    _key: string;
+  } | {
+    filename?: string;
+    language?: "bash" | "css" | "graphql" | "html" | "js" | "json" | "jsx" | "liquid" | "python" | "swift" | "text" | "ts" | "tsx";
+    code?: string;
+    _type: "codeBlock";
+    _key: string;
+  } | {
+    url?: string;
+    caption?: string;
+    _type: "embed";
+    _key: string;
+  } | {
+    images?: Array<{
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }>;
+    perRow?: 1 | 2 | 3 | 4;
+    caption?: string;
+    _type: "gallery";
     _key: string;
   } | {
     asset?: {
@@ -922,9 +1281,20 @@ export type ABOUT_QUERYResult = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt: string | null;
+    caption?: string;
     _type: "image";
     _key: string;
     imageUrl: string | null;
+  } | {
+    rows?: Array<{
+      cells?: Array<string>;
+      _type: "row";
+      _key: string;
+    }>;
+    hasHeader?: boolean;
+    caption?: string;
+    _type: "table";
+    _key: string;
   }> | null;
   contributions: Array<{
     _key: string;
@@ -959,7 +1329,7 @@ export type CATEGORIES_QUERYResult = Array<{
   slug: string | null;
 }>;
 // Variable: POSTS_PREVIEW_BY_SLUG_QUERY
-// Query: *[  _type == "post" &&   ($categorySlug == null || $categorySlug in categories[]->slug.current)] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    "slug": slug.current  },  publishedAt,}
+// Query: *[  _type == "post" && defined(slug.current) && publishedAt <= now() &&   ($categorySlug == null || $categorySlug in categories[]->slug.current)] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  categories[]->{    _id,    title,    "slug": slug.current  },  publishedAt,}
 export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -975,6 +1345,7 @@ export type POSTS_PREVIEW_BY_SLUG_QUERYResult = Array<{
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
   } | null;
   categories: Array<{
@@ -1043,6 +1414,55 @@ export type HOST_SHELF_QUERYResult = {
     garnishes: Array<string | null> | null;
   }>;
 };
+// Variable: TRAVEL_POSTS_QUERY
+// Query: *[  _type == "post" && defined(slug.current) && publishedAt <= now() && "travel" in categories[]->slug.current] | order(publishedAt desc){  _id,  title,  slug,  excerpt,  mainImage,  publishedAt}
+export type TRAVEL_POSTS_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  excerpt: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+  } | null;
+  publishedAt: string | null;
+}>;
+// Variable: SITEMAP_QUERY
+// Query: {  "posts": *[_type == "post" && defined(slug.current) && publishedAt <= now()]{ "slug": slug.current, publishedAt, updatedAt, _updatedAt },  "caseStudies": *[_type == "caseStudy" && defined(slug.current)]{ "slug": slug.current, _updatedAt },  "pages": *[_type == "page" && defined(slug.current)]{ "slug": slug.current, _updatedAt }}
+export type SITEMAP_QUERYResult = {
+  posts: Array<{
+    slug: string | null;
+    publishedAt: string | null;
+    updatedAt: string | null;
+    _updatedAt: string;
+  }>;
+  caseStudies: Array<{
+    slug: string | null;
+    _updatedAt: string;
+  }>;
+  pages: Array<{
+    slug: string | null;
+    _updatedAt: string;
+  }>;
+};
+// Variable: RSS_POSTS_QUERY
+// Query: *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc)[0...50]{  title,  "slug": slug.current,  excerpt,  publishedAt,  "categories": categories[]->title}
+export type RSS_POSTS_QUERYResult = Array<{
+  title: string | null;
+  slug: string | null;
+  excerpt: string | null;
+  publishedAt: string | null;
+  categories: Array<string | null> | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -1051,14 +1471,14 @@ declare module "@sanity/client" {
     "*[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  mainImage,\n  description[]{\n  ...,\n  _type == \"image\" => {\n    \"imageUrl\": asset->url,\n    alt\n  }\n},\n}\n": CASE_STUDIES_QUERYResult;
     "*[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}": CASE_STUDIES_PREVIEW_QUERYResult;
     "*[_type == \"caseStudy\" && slug.current == $slug][0]{\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  },\n  description[]{\n  ...,\n  _type == \"image\" => {\n    \"imageUrl\": asset->url,\n    alt\n  }\n},\n}": CASE_STUDY_BY_SLUG_QUERYResult;
-    "*[_type == \"post\"] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}": POSTS_PREVIEWS_QUERYResult;
-    "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      mainImage {\n        asset->{\n          url,\n          metadata\n        },\n        alt\n      },\n      categories[]->{\n        _id,\n        title\n      },\n      publishedAt,\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n    \n    \"relatedPostsByCategory\": *[_type == \"post\" && slug.current != $slug && references(*[_type == \"post\" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n    \n    \"fallbackPosts\": *[_type == \"post\" && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n\n    \"author\": *[_type == \"siteInfo\"][0]{\n      title,\n      email,\n      authorBio,\n      authorImage,\n      socialMedia\n    }\n  }\n": SINGLE_POST_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}": POSTS_PREVIEWS_QUERYResult;
+    "\n  {\n    \"post\": *[_type == \"post\" && slug.current == $slug && ($preview || publishedAt <= now())][0]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      seoTitle,\n      seoDescription,\n      mainImage,\n      categories[]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      tags,\n      publishedAt,\n      updatedAt,\n      \"bodyText\": pt::text(body),\n      body[]{\n        ...,\n        _type == \"image\" => {\n          \"imageUrl\": asset->url,\n          alt\n        }\n      }\n    },\n\n    \"relatedPostsByCategory\": *[_type == \"post\" && defined(slug.current) && publishedAt <= now() && slug.current != $slug && references(*[_type == \"post\" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n\n    \"fallbackPosts\": *[_type == \"post\" && defined(slug.current) && publishedAt <= now() && slug.current != $slug] | order(publishedAt desc)[0...3]{\n      _id,\n      title,\n      slug,\n      excerpt,\n      publishedAt\n    },\n\n    // A post's own author wins; otherwise Site Info, mapped to the same shape.\n    \"author\": coalesce(\n      *[_type == \"post\" && slug.current == $slug][0].author->{\n        \"name\": name,\n        \"title\": role,\n        email,\n        \"authorBio\": bio,\n        \"authorImage\": image\n      },\n      *[_type == \"siteInfo\"][0]{\n        \"name\": null,\n        title,\n        email,\n        authorBio,\n        authorImage\n      }\n    )\n  }\n": SINGLE_POST_QUERYResult;
     "\n  *[_type == \"page\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    body[]{\n      ...,\n      _type == \"image\" => {\n        \"imageUrl\": asset->url,\n        alt\n      }\n    }\n  }\n": PAGE_QUERYResult;
     "*[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n}": SITE_INFO_QUERYResult;
-    "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n},\n  \"caseStudies\": *[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}[0...2],\n  \"posts\": *[_type == \"post\"] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}[0...2],\n}": HOME_QUERYResult;
+    "{\n  \"siteInfo\": *[_type == \"siteInfo\"][0]{\n  _id,\n  title,\n  email,\n  resume,\n  description[]{\n    ...,\n  },\n  socialMedia\n},\n  \"caseStudies\": *[_type == \"caseStudy\"] | order(_createdAt desc){\n  _id,\n  title,\n  subtitle,\n  teaser,\n  slug,\n  mainImage {\n    ...,\n    metadata\n  }\n}[0...2],\n  \"posts\": *[_type == \"post\" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    slug\n  },\n  publishedAt,\n}[0...2],\n}": HOME_QUERYResult;
     "*[_type == \"about\"][0]{\n  _id,\n  _createdAt,\n  _updatedAt,\n  bio[]{\n    ...,\n    _type == \"image\" => {\n      \"imageUrl\": asset->url,\n      alt\n    }\n  },\n  contributions[]{\n    _key,\n    title,\n    contributions[]{\n      _key,\n      title,\n      date,\n      description,\n      link\n    }\n  },\n  mainImage {\n    ...,\n    metadata\n  },\n}": ABOUT_QUERYResult;
     "*[_type == \"category\"]{\n  _id,\n  title,\n  \"slug\": slug.current\n}\n": CATEGORIES_QUERYResult;
-    "*[\n  _type == \"post\" && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
+    "*[\n  _type == \"post\" && defined(slug.current) && publishedAt <= now() && \n  ($categorySlug == null || $categorySlug in categories[]->slug.current)\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  categories[]->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  publishedAt,\n}": POSTS_PREVIEW_BY_SLUG_QUERYResult;
     "*[\n  _type == \"cocktail\" && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n] | order(name asc){\n  _id,\n  name,\n  description,\n  \"ingredients\": ingredients[]{\"name\": coalesce(label, ingredient->name)}.name,\n  category,\n}": COCKTAILS_QUERYResult;
     "{\n  \"open\": coalesce(*[_type == \"barSession\"][0].open, false),\n  \"orders\": *[_type == \"order\"] | order(placedAt asc){\n    _id,\n    guestName,\n    notes,\n    status,\n    placedAt,\n    \"cocktailId\": cocktail._ref,\n    \"cocktailName\": cocktail->name\n  }\n}": BAR_STATE_QUERYResult;
     "coalesce(*[_type == \"barSession\"][0].open, false)": BAR_OPEN_QUERYResult;
@@ -1066,5 +1486,8 @@ declare module "@sanity/client" {
     "*[\n  _type == \"cocktail\" && _id == $cocktailId && available != false\n  && count(ingredients) > 0\n  && count(ingredients[optional != true && ingredient->inStock != true]) == 0\n][0]{\n  _id,\n  name\n}": ORDERABLE_COCKTAIL_QUERYResult;
     "count(*[_type == \"order\"])": ORDER_COUNT_QUERYResult;
     "{\n  \"ingredients\": *[_type == \"ingredient\"] | order(name asc){\n    _id,\n    name,\n    category,\n    \"inStock\": inStock == true\n  },\n  \"cocktails\": *[_type == \"cocktail\" && available != false && count(ingredients) > 0]{\n    _id,\n    name,\n    \"requires\": ingredients[optional != true].ingredient._ref,\n    \"garnishes\": ingredients[optional == true].ingredient._ref\n  }\n}": HOST_SHELF_QUERYResult;
+    "*[\n  _type == \"post\" && defined(slug.current) && publishedAt <= now() && \"travel\" in categories[]->slug.current\n] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  excerpt,\n  mainImage,\n  publishedAt\n}": TRAVEL_POSTS_QUERYResult;
+    "{\n  \"posts\": *[_type == \"post\" && defined(slug.current) && publishedAt <= now()]{ \"slug\": slug.current, publishedAt, updatedAt, _updatedAt },\n  \"caseStudies\": *[_type == \"caseStudy\" && defined(slug.current)]{ \"slug\": slug.current, _updatedAt },\n  \"pages\": *[_type == \"page\" && defined(slug.current)]{ \"slug\": slug.current, _updatedAt }\n}": SITEMAP_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc)[0...50]{\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  \"categories\": categories[]->title\n}": RSS_POSTS_QUERYResult;
   }
 }

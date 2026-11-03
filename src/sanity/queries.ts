@@ -48,11 +48,16 @@ export const CASE_STUDY_BY_SLUG_QUERY =
   description[]${DESCRIPTION_FIELD},
 }`);
 
+// Listings only show posts whose publish date has arrived, so a scheduled post
+// stays hidden until then. The single-post query relaxes this in draft mode.
+const PUBLISHED_POST = `_type == "post" && defined(slug.current) && publishedAt <= now()`;
+
 const POST_PREVIEW_FIELDS = `{
   _id,
   title,
   slug,
   excerpt,
+  mainImage,
   categories[]->{
     _id,
     title,
@@ -62,28 +67,28 @@ const POST_PREVIEW_FIELDS = `{
 }`;
 
 export const POSTS_PREVIEWS_QUERY = defineQuery(
-  `*[_type == "post"] | order(publishedAt desc)${POST_PREVIEW_FIELDS}`
+  `*[${PUBLISHED_POST}] | order(publishedAt desc)${POST_PREVIEW_FIELDS}`
 );
 
 export const SINGLE_POST_QUERY = defineQuery(`
   {
-    "post": *[_type == "post" && slug.current == $slug][0]{
+    "post": *[_type == "post" && slug.current == $slug && ($preview || publishedAt <= now())][0]{
       _id,
       title,
       slug,
       excerpt,
-      mainImage {
-        asset->{
-          url,
-          metadata
-        },
-        alt
-      },
+      seoTitle,
+      seoDescription,
+      mainImage,
       categories[]->{
         _id,
-        title
+        title,
+        "slug": slug.current
       },
+      tags,
       publishedAt,
+      updatedAt,
+      "bodyText": pt::text(body),
       body[]{
         ...,
         _type == "image" => {
@@ -92,16 +97,8 @@ export const SINGLE_POST_QUERY = defineQuery(`
         }
       }
     },
-    
-    "relatedPostsByCategory": *[_type == "post" && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{
-      _id,
-      title,
-      slug,
-      excerpt,
-      publishedAt
-    },
-    
-    "fallbackPosts": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3]{
+
+    "relatedPostsByCategory": *[${PUBLISHED_POST} && slug.current != $slug && references(*[_type == "post" && slug.current == $slug][0].categories[]._ref)] | order(publishedAt desc)[0...3]{
       _id,
       title,
       slug,
@@ -109,13 +106,31 @@ export const SINGLE_POST_QUERY = defineQuery(`
       publishedAt
     },
 
-    "author": *[_type == "siteInfo"][0]{
+    "fallbackPosts": *[${PUBLISHED_POST} && slug.current != $slug] | order(publishedAt desc)[0...3]{
+      _id,
       title,
-      email,
-      authorBio,
-      authorImage,
-      socialMedia
-    }
+      slug,
+      excerpt,
+      publishedAt
+    },
+
+    // A post's own author wins; otherwise Site Info, mapped to the same shape.
+    "author": coalesce(
+      *[_type == "post" && slug.current == $slug][0].author->{
+        "name": name,
+        "title": role,
+        email,
+        "authorBio": bio,
+        "authorImage": image
+      },
+      *[_type == "siteInfo"][0]{
+        "name": null,
+        title,
+        email,
+        authorBio,
+        authorImage
+      }
+    )
   }
 `);
 
@@ -152,7 +167,7 @@ export const SITE_INFO_QUERY = defineQuery(SITE_INFO_QUERY_FIELDS);
 export const HOME_QUERY = defineQuery(`{
   "siteInfo": ${SITE_INFO_QUERY_FIELDS},
   "caseStudies": *[_type == "caseStudy"] | order(_createdAt desc)${CASE_STUDY_PREVIEW_FIELDS}[0...2],
-  "posts": *[_type == "post"] | order(publishedAt desc)${POST_PREVIEW_FIELDS}[0...2],
+  "posts": *[${PUBLISHED_POST}] | order(publishedAt desc)${POST_PREVIEW_FIELDS}[0...2],
 }`);
 
 export const ABOUT_QUERY = defineQuery(`*[_type == "about"][0]{
@@ -191,7 +206,7 @@ export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"]{
 `);
 
 export const POSTS_PREVIEW_BY_SLUG_QUERY = defineQuery(`*[
-  _type == "post" && 
+  ${PUBLISHED_POST} && 
   ($categorySlug == null || $categorySlug in categories[]->slug.current)
 ] | order(publishedAt desc){
   _id,
@@ -309,4 +324,29 @@ export const HOST_SHELF_QUERY = defineQuery(`{
     "requires": ingredients[optional != true].ingredient._ref,
     "garnishes": ingredients[optional == true].ingredient._ref
   }
+}`);
+
+export const TRAVEL_POSTS_QUERY = defineQuery(`*[
+  ${PUBLISHED_POST} && "travel" in categories[]->slug.current
+] | order(publishedAt desc){
+  _id,
+  title,
+  slug,
+  excerpt,
+  mainImage,
+  publishedAt
+}`);
+
+export const SITEMAP_QUERY = defineQuery(`{
+  "posts": *[${PUBLISHED_POST}]{ "slug": slug.current, publishedAt, updatedAt, _updatedAt },
+  "caseStudies": *[_type == "caseStudy" && defined(slug.current)]{ "slug": slug.current, _updatedAt },
+  "pages": *[_type == "page" && defined(slug.current)]{ "slug": slug.current, _updatedAt }
+}`);
+
+export const RSS_POSTS_QUERY = defineQuery(`*[${PUBLISHED_POST}] | order(publishedAt desc)[0...50]{
+  title,
+  "slug": slug.current,
+  excerpt,
+  publishedAt,
+  "categories": categories[]->title
 }`);

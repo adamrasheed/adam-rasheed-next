@@ -9,8 +9,16 @@ type SanityImageProps = {
   img: SanityMainImage;
   alt?: string;
   className?: string;
+  sizes?: string;
+  priority?: boolean;
 };
-const SanityImage: FC<SanityImageProps> = ({ img, alt = "", className }) => {
+const SanityImage: FC<SanityImageProps> = ({
+  img,
+  alt = "",
+  className,
+  sizes,
+  priority,
+}) => {
   const imageProps = useNextSanityImage(client, img);
 
   if (!imageProps) return null;
@@ -24,6 +32,8 @@ const SanityImage: FC<SanityImageProps> = ({ img, alt = "", className }) => {
         src={imageProps.src}
         layout="fill"
         alt={alt || img?.alt || ""}
+        sizes={sizes}
+        priority={priority}
         style={{
           objectFit: "contain",
         }}

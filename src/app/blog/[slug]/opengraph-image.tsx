@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { createClient } from "next-sanity";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 import { SITE_NAME } from "@/constants";
+import { urlFor } from "@/sanity/lib/image";
 
 // Required for the font fetch below: on the Node runtime `new URL(..., import
 // .meta.url)` resolves to a relative /_next/static path that fetch cannot parse.
@@ -32,7 +33,8 @@ const ROLE = "Frontend Software Engineer";
 // than in queries.ts to keep this change off that file.
 const OG_POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   title,
-  "category": categories[0]->title
+  "category": categories[0]->title,
+  mainImage{ asset, crop, hotspot }
 }`;
 
 // Keeps long titles on the card without shrinking short ones.
@@ -74,6 +76,7 @@ export default async function OpengraphImage({
 
   let title = SITE_NAME;
   let category = "Blog";
+  let photo: string | null = null;
 
   // A card with fallback text still beats no card, so a Sanity outage must not
   // fail the image route.
@@ -81,10 +84,20 @@ export default async function OpengraphImage({
     const post = await ogClient.fetch<{
       title?: string;
       category?: string;
+      mainImage?: { asset?: { _ref: string } };
     } | null>(OG_POST_QUERY, { slug });
 
     if (post?.title) title = post.title;
     if (post?.category) category = post.category;
+    // Travel posts read better with the photo than with a text card.
+    if (post?.mainImage?.asset) {
+      photo = urlFor(post.mainImage)
+        .width(size.width)
+        .height(size.height)
+        .fit("crop")
+        .format("jpg")
+        .url();
+    }
   } catch {
     // fall through to the defaults
   }
@@ -101,8 +114,34 @@ export default async function OpengraphImage({
           backgroundColor: BACKGROUND,
           padding: 80,
           fontFamily: "Inter",
+          position: "relative",
         }}
       >
+        {photo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photo}
+            alt=""
+            width={size.width}
+            height={size.height}
+            style={{ position: "absolute", top: 0, left: 0 }}
+          />
+        )}
+        {photo && (
+          // Darkens the photo enough for the light title to stay legible.
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              backgroundImage:
+                "linear-gradient(to bottom, rgba(15,23,42,0.55), rgba(15,23,42,0.85))",
+            }}
+          />
+        )}
         {/* The site wordmark: bold name, 1px rule, small-caps role. */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: PRIMARY }}>
