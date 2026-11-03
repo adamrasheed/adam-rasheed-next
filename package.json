@@ -19,6 +19,7 @@
     "@sanity/client": "^6.21.3",
     "@sanity/icons": "^3.4.0",
     "@sanity/image-url": "^1.0.2",
+    "@sanity/preview-url-secret": "1.6.20",
     "@sanity/react-loader": "^1.10.6",
     "@sanity/vision": "^3.57.0",
     "clsx": "^2.1.1",
