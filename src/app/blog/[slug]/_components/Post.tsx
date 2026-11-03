@@ -26,7 +26,7 @@ const Post = ({
     post;
 
   const isTravel = post.categories?.some(
-    (category) => stegaClean(category.slug) === "travel"
+    (category) => category.slug && stegaClean(category.slug) === "travel"
   );
 
   // Recency-based filler. It used to be merged into the related list under one
