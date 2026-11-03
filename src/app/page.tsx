@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 export default async function IndexPage() {
   const { siteInfo, posts, caseStudies } = await sanityFetch<HOME_QUERYResult>({
     query: HOME_QUERY,
+    tags: ["siteInfo", "post", "caseStudy"],
   });
 
   if (!siteInfo) return <div>Loading...</div>;

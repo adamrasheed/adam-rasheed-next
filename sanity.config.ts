@@ -7,6 +7,7 @@
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
+import { presentationTool } from "sanity/presentation";
 import { vercelDeployTool } from "sanity-plugin-vercel-deploy";
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
@@ -22,6 +23,14 @@ export default defineConfig({
   schema,
   plugins: [
     structureTool({ structure }),
+    // Live preview of drafts on the real site, including scheduled posts.
+    presentationTool({
+      previewUrl: {
+        origin: typeof location === "undefined" ? undefined : location.origin,
+        preview: "/blog",
+        previewMode: { enable: "/api/draft-mode/enable" },
+      },
+    }),
     // Vision is for querying with GROQ from inside the Studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),

@@ -12,9 +12,10 @@
 //   --dry-run             print the document that would be written, write nothing
 //
 // The markdown must use only what src/sanity/schemaTypes/blockContentType.ts
-// can represent: h2/h3/h4, blockquote, bulleted lists, bold, italic, and links.
-// Anything else (code fences, ordered lists, images, tables) is a hard error
-// rather than a silent drop, so a post never lands in Studio missing content.
+// can represent: h2/h3/h4, blockquote, bulleted and numbered lists, code
+// fences, pipe tables, bold, italic, inline code, and links. Anything else
+// (images, rules) is a hard error rather than a silent drop, so a post never
+// lands in Studio missing content. Add photos and galleries in Studio.
 
 import { createClient } from "@sanity/client";
 import { readFileSync, existsSync } from "node:fs";
@@ -83,6 +84,7 @@ function inlineSpans(text, markDefs) {
     const link = rest.match(/\[([^\]]+)\]\(([^)\s]+)\)/);
     const bold = rest.match(/\*\*([^*]+)\*\*/);
     const em = rest.match(/(^|[^*])\*([^*]+)\*/);
+    const code = rest.match(/`([^`]+)`/);
 
     const candidates = [
       link && { kind: "link", at: link.index, m: link },
@@ -90,6 +92,7 @@ function inlineSpans(text, markDefs) {
       // The em pattern captures the preceding character so `**` isn't matched
       // as italic, so the token starts after that lead group, not at em.index.
       em && { kind: "em", at: em.index + (em[1]?.length ?? 0), m: em },
+      code && { kind: "code", at: code.index, m: code },
     ].filter(Boolean);
 
     if (!candidates.length) {
@@ -105,6 +108,11 @@ function inlineSpans(text, markDefs) {
       const defKey = key();
       markDefs.push({ _key: defKey, _type: "link", href: m[2] });
       push(m[1], [defKey]);
+      rest = rest.slice(m.index + m[0].length);
+    } else if (next.kind === "code") {
+      const m = next.m;
+      push(rest.slice(0, m.index), []);
+      push(m[1], ["code"]);
       rest = rest.slice(m.index + m[0].length);
     } else if (next.kind === "bold") {
       const m = next.m;
@@ -143,41 +151,84 @@ function toPortableText(md) {
     paragraph = [];
   };
 
-  lines.forEach((rawLine, i) => {
-    const line = rawLine.trimEnd();
+  const cells = (row) =>
+    row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trimEnd();
     const at = `line ${i + 1}`;
 
-    if (/^```/.test(line)) die(`code fence at ${at}; the schema has no code block type`);
-    if (/^\s*\d+\.\s/.test(line)) die(`ordered list at ${at}; the schema only supports bullets`);
-    if (/^!\[/.test(line)) die(`image at ${at}; blog post bodies must be text only`);
-    if (/^\|/.test(line)) die(`table at ${at}; the schema has no table type`);
+    const fence = line.match(/^```\s*([\w-]*)/);
+    if (fence) {
+      flush();
+      const code = [];
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i].trimEnd())) code.push(lines[i++]);
+      if (i >= lines.length) die(`unclosed code fence opened at ${at}`);
+      blocks.push({
+        _type: "codeBlock",
+        _key: key(),
+        ...(fence[1] && { language: fence[1] }),
+        code: code.join("\n"),
+      });
+      continue;
+    }
+
+    if (/^\|/.test(line)) {
+      flush();
+      const rows = [];
+      while (i < lines.length && /^\|/.test(lines[i].trim())) rows.push(lines[i++]);
+      i--;
+      // The second row of a GFM table is the |---|---| separator.
+      const hasHeader = rows.length > 1 && /^[\s|:-]+$/.test(rows[1]);
+      if (hasHeader) rows.splice(1, 1);
+      blocks.push({
+        _type: "table",
+        _key: key(),
+        hasHeader,
+        rows: rows.map((row) => ({ _type: "row", _key: key(), cells: cells(row) })),
+      });
+      continue;
+    }
+
+    if (/^!\[/.test(line)) die(`image at ${at}; add photos and galleries in Studio`);
     if (/^(---|\*\*\*|___)\s*$/.test(line)) die(`horizontal rule at ${at}; unsupported`);
     if (/^#\s/.test(line)) die(`h1 at ${at}; the page renders the title as the h1, use h2`);
 
-    if (!line.trim()) return flush();
+    if (!line.trim()) {
+      flush();
+      continue;
+    }
 
     const heading = line.match(/^(#{2,4})\s+(.*)$/);
     if (heading) {
       flush();
       blocks.push(block(`h${heading[1].length}`, heading[2]));
-      return;
+      continue;
     }
 
     if (/^>\s?/.test(line)) {
       flush();
       blocks.push(block("blockquote", line.replace(/^>\s?/, "")));
-      return;
+      continue;
     }
 
     const bullet = line.match(/^[-*]\s+(.*)$/);
     if (bullet) {
       flush();
       blocks.push(block("normal", bullet[1], { listItem: "bullet", level: 1 }));
-      return;
+      continue;
+    }
+
+    const numbered = line.match(/^\d+\.\s+(.*)$/);
+    if (numbered) {
+      flush();
+      blocks.push(block("normal", numbered[1], { listItem: "number", level: 1 }));
+      continue;
     }
 
     paragraph.push(line.trim());
-  });
+  }
 
   flush();
   return blocks;
@@ -269,8 +320,10 @@ async function main() {
     console.log(JSON.stringify(doc, null, 2));
     console.error(
       `\nimport-post: dry run. ${blocks.length} blocks, ` +
-        `${blocks.filter((b) => b.style !== "normal").length} headings/quotes, ` +
-        `${blocks.filter((b) => b.listItem).length} list items. Nothing written.`,
+        `${blocks.filter((b) => b._type === "block" && b.style !== "normal").length} headings/quotes, ` +
+        `${blocks.filter((b) => b.listItem).length} list items, ` +
+        `${blocks.filter((b) => b._type === "codeBlock").length} code blocks, ` +
+        `${blocks.filter((b) => b._type === "table").length} tables. Nothing written.`,
     );
     return;
   }

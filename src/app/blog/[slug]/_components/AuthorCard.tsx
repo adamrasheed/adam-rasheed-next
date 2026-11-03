@@ -15,10 +15,11 @@ const AVATAR_DISPLAY_PX = 56;
 const AuthorCard = ({ author }: { author: AuthorType }) => {
   if (!author) return null;
 
-  // siteInfo.title is the tagline ("Frontend Software Engineer"), not the name.
+  // `title` is the role line (siteInfo.title or author.role), not the name.
   const { title: role, email, authorBio, authorImage } = author;
 
-  const name = SITE_NAME;
+  // Site Info has no name field, so it falls back to the site name.
+  const name = author.name || SITE_NAME;
 
   const avatarBuilder = authorImage?.asset
     ? urlFor(authorImage)

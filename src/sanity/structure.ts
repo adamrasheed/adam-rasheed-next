@@ -8,6 +8,7 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("post").title("Posts"),
       S.documentTypeListItem("page").title("Pages"),
       S.documentTypeListItem("category").title("Categories"),
+      S.documentTypeListItem("author").title("Authors"),
       S.documentTypeListItem("caseStudy").title("Case Studies"),
       S.listItem()
         .title("About")
@@ -33,6 +34,7 @@ export const structure: StructureResolver = (S) =>
             "post",
             "page",
             "category",
+            "author",
             "caseStudy",
             "siteInfo",
             "about",

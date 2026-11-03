@@ -1,5 +1,5 @@
 import { PortableText } from "next-sanity";
-import SanityImage from "./SanityImage";
+import { CodeBlock, Embed, Figure, Gallery, Table } from "./RichTextBlocks";
 import clsx from "clsx";
 import { TypedObject } from "sanity";
 import Link from "next/link";
@@ -14,7 +14,11 @@ export const richTextComponents = (
   headingIds?: Record<string, string>
 ): PortableTextComponents => ({
   types: {
-    image: ({ value }) => <SanityImage img={value} className={imgClassName} />,
+    image: ({ value }) => <Figure value={value} className={imgClassName} />,
+    gallery: Gallery,
+    codeBlock: CodeBlock,
+    table: Table,
+    embed: Embed,
   },
   marks: {
     link: ({ value, children }) => {
