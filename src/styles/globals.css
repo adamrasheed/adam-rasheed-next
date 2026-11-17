@@ -311,3 +311,8 @@ body {
     max-width: 50rem;
   }
 }
+
+/* Lock page scroll while a lightbox dialog is open. */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
