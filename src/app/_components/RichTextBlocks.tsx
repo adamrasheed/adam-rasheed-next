@@ -12,14 +12,18 @@ function aspectRatio(photo: Photo) {
   return match ? Number(match[1]) / Number(match[2]) : 1;
 }
 
-const Zoomable = ({ photo, children }: { photo: Photo; children: React.ReactNode }) => (
-  <Lightbox
-    src={urlFor(photo).width(2400).fit("max").auto("format").url()}
-    alt={photo.alt ?? ""}
-  >
-    {children}
-  </Lightbox>
-);
+const Zoomable = ({ photo, children }: { photo: Photo; children: React.ReactNode }) =>
+  // urlFor throws on an image block whose upload never finished.
+  photo.asset ? (
+    <Lightbox
+      src={urlFor(photo).width(2400).fit("max").auto("format").url()}
+      alt={photo.alt ?? ""}
+    >
+      {children}
+    </Lightbox>
+  ) : (
+    <>{children}</>
+  );
 
 export const Figure = ({
   value,

@@ -15,9 +15,10 @@ const Lightbox = ({
   // Mount the full-size image only once opened so closed lightboxes cost nothing.
   const [opened, setOpened] = useState(false);
 
+  // showModal first: if it throws, the full-size image is never requested.
   const open = () => {
-    setOpened(true);
     dialogRef.current?.showModal();
+    setOpened(true);
   };
 
   return (
