@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import SanityImage from "./SanityImage";
+import Lightbox from "./Lightbox";
+import { urlFor } from "@/sanity/lib/image";
 import { SanityMainImage } from "../_types";
 
 type Photo = SanityMainImage & { _key?: string; caption?: string };
@@ -10,6 +12,19 @@ function aspectRatio(photo: Photo) {
   return match ? Number(match[1]) / Number(match[2]) : 1;
 }
 
+const Zoomable = ({ photo, children }: { photo: Photo; children: React.ReactNode }) =>
+  // urlFor throws on an image block whose upload never finished.
+  photo.asset ? (
+    <Lightbox
+      src={urlFor(photo).width(2400).fit("max").auto("format").url()}
+      alt={photo.alt ?? ""}
+    >
+      {children}
+    </Lightbox>
+  ) : (
+    <>{children}</>
+  );
+
 export const Figure = ({
   value,
   className,
@@ -18,7 +33,9 @@ export const Figure = ({
   className?: string;
 }) => (
   <figure>
-    <SanityImage img={value} className={className} />
+    <Zoomable photo={value}>
+      <SanityImage img={value} className={className} />
+    </Zoomable>
     {value.caption && <figcaption>{value.caption}</figcaption>}
   </figure>
 );
@@ -49,10 +66,12 @@ export const Gallery = ({
               style={{ flex: `${aspectRatio(photo)} 1 0%` }}
               className="min-w-0"
             >
-              <SanityImage
-                img={photo}
-                sizes={`(min-width: 640px) ${Math.round(100 / row.length)}vw, 100vw`}
-              />
+              <Zoomable photo={photo}>
+                <SanityImage
+                  img={photo}
+                  sizes={`(min-width: 640px) ${Math.round(100 / row.length)}vw, 100vw`}
+                />
+              </Zoomable>
               {photo.caption && <figcaption>{photo.caption}</figcaption>}
             </figure>
           ))}
